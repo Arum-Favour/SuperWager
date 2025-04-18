@@ -25,7 +25,7 @@ import pfp from "@/assets/images/default.png";
 
 export default function Aside() {
   return (
-    <aside className="min-h-screen flex flex-col space-y-16 justify-between">
+    <aside className="min-h-screen lg:flex flex-col space-y-16 justify-between hidden">
       <div className="w-full flex flex-col items-center justify-center space-y-4">
         <div className="w-full flex items-center justify-center flex-col gap-4 aspect-square bg-[var(--primary)] p-12 rounded-2xl relative text-white">
           <span className="absolute top-4 right-4 cursor-pointer p-0.5 border-[2px] border-white rounded-full">

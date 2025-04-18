@@ -96,14 +96,18 @@ export default function LeaderboardTable() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center gap-6 bg-[var(--primary-light)] p-6 md:px-8 rounded-2xl">
-      <div className="w-full items-center flex justify-between">
+    <div className="flex flex-col items-center justify-center gap-6 bg-[var(--primary-light)] p-6 md:px-8 rounded-2xl w-full">
+      <div className="w-full items-start md:items-center flex justify-between">
         <div className="flex flex-col gap-1">
-          <div className="flex gap-4 items-center">
-            <h2 className="text-3xl font-normal">Weekly Leaderboard</h2>
-            <p className="text-[#32FF40] text-2xl">2D: 06H: 37M: 12S</p>
+          <div className="flex max-sm:flex-col md:gap-4 md:items-center">
+            <h2 className="text-lg md:text-3xl font-normal">
+              Weekly Leaderboard
+            </h2>
+            <p className="text-[#32FF40] md:text-2xl md:ml-0.5">
+              2D: 06H: 37M: 12S
+            </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex max-sm:flex-col max-sm:gap-0 mt-4 items-center gap-4">
             <p className="flex items-center gap-2">
               <span className="size-2.5 bg-[#32ff40] rounded-full" />
               <span>Total Players: 1,879</span>
@@ -111,27 +115,27 @@ export default function LeaderboardTable() {
             <p>Updated 1 hour ago</p>
           </div>
         </div>
-        <div className="flex flex-col gap-1">
-          <h4 className="text-xl font-normal">Pool (STT)</h4>
+        <div className="flex flex-col items-center gap-1">
+          <h4 className=" md:text-xl font-normal">Pool (STT)</h4>
           <div className="flex items-center justify-center gap-4">
-            <LessThan className="size-6 cursor-pointer" />
+            <LessThan className="size-4 md:size-6 cursor-pointer" />
             <h4 className="text-2xl font-normal">0.1</h4>
-            <GreaterThan className="size-6 cursor-pointer" />
+            <GreaterThan className="size-4 md:size-6 cursor-pointer" />
           </div>
         </div>
       </div>
       <table className="w-full">
         <thead>
           <tr>
-            <th className="p-2 font-normal text-center">Position</th>
-            <th className="p-2 font-normal text-center">Players</th>
-            <th className="p-2 font-normal text-center">
+            <th className="md:p-2 font-normal text-center">Position</th>
+            <th className="md:p-2 font-normal text-center">Players</th>
+            <th className="md:p-2 font-normal text-center">
               Total Odds <span className="text-black/50">(Point)</span>
             </th>
-            <th className="p-2 font-normal text-center">
+            <th className="md:p-2 font-normal text-center">
               Accuracy <span className="text-black/50">(Point)</span>
             </th>
-            <th className="p-2 font-normal text-center">Total Points</th>
+            <th className="md:p-2 font-normal text-center">Total Points</th>
           </tr>
         </thead>
         <tbody>
@@ -140,10 +144,10 @@ export default function LeaderboardTable() {
               key={i}
               className={`${i == 0 ? "text-[var(--primary)]" : "text-black"}`}
             >
-              <td className="p-2 py-4 text-center border-b border-b-[var(--primary)]/30">
+              <td className="md:p-2 py-4 text-center border-b border-b-[var(--primary)]/30">
                 {i + 1}
               </td>
-              <td className="p-2 py-4 text-center border-b border-b-[var(--primary)]/30">
+              <td className="md:p-2 py-4 text-center border-b border-b-[var(--primary)]/30">
                 {player.name}
               </td>
               <td className="p-2 py-4 text-center border-b border-b-[var(--primary)]/30">
@@ -152,13 +156,13 @@ export default function LeaderboardTable() {
                   ({player.totalOdds.points.toFixed(1)})
                 </span>
               </td>
-              <td className="p-2 py-4 text-center border-b border-b-[var(--primary)]/30">
+              <td className="md:p-2 py-4 text-center border-b border-b-[var(--primary)]/30">
                 {player.accuracy.accuracy.toFixed(1)}
                 <span className="text-black/50">
                   ({player.accuracy.points.toFixed(1)})
                 </span>
               </td>
-              <td className="p-2 py-4 text-center border-b border-b-[var(--primary)]/30">
+              <td className="md:p-2 py-4 text-center border-b border-b-[var(--primary)]/30">
                 {player.totalPoints.toFixed(1)}
               </td>
             </tr>
@@ -168,7 +172,7 @@ export default function LeaderboardTable() {
       <div>
         <button
           onClick={openModal}
-          className="text-lg font-normal bg-[var(--primary)] rounded-lg p-3.5 text-white capitalize hover:bg-[var(--primary)]/80"
+          className="md:text-lg font-normal bg-[var(--primary)] rounded-lg p-2 md:p-3.5 text-white capitalize hover:bg-[var(--primary)]/80"
         >
           See Full Leaderboard
         </button>

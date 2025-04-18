@@ -579,7 +579,7 @@ export function MiniMatchesTable() {
   return (
     <div className="w-full flex flex-col gap-4">
       <div className="w-full flex items-center justify-between">
-        <h2 className="text-4xl">Football</h2>
+        <h2 className="text-2xl lg:text-4xl">Football</h2>
       </div>
       <div className="flex w-full">
         <div
@@ -587,7 +587,7 @@ export function MiniMatchesTable() {
           onClick={() => handleTabClick("live")}
         >
           <p
-            className={`text-xl ${
+            className={`md:text-xl ${
               activeTab === "live" ? "text-[var(--primary)]" : ""
             }`}
           >
@@ -605,7 +605,7 @@ export function MiniMatchesTable() {
           onClick={() => handleTabClick("upcoming")}
         >
           <p
-            className={`text-xl ${
+            className={`md:text-xl ${
               activeTab === "upcoming" ? "text-[var(--primary)]" : ""
             }`}
           >
@@ -621,22 +621,22 @@ export function MiniMatchesTable() {
           ? matches.liveMatches.map((match) => (
               <div
                 key={match.id}
-                className="w-full px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
+                className="w-full md:px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
               >
-                <div className="flex items-center gap-8">
+                <div className="flex items-center gap-2 md:gap-8">
                   <div className="flex flex-col items-center justify-center text-[#32ff40]">
                     <span className="text-base">{match.minute}&apos;</span>
                     <span className="text-sm">
                       {match.minute < 46 ? "1st" : "2nd"}
                     </span>
                   </div>
-                  <div className="text-xl flex flex-col gap-2 justify-center">
+                  <div className="md:text-xl flex flex-col gap-2 justify-center">
                     <span>{match.homeTeam}</span>
                     <span>{match.awayTeam}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-8">
-                  <div className="text-xl flex flex-col gap-2 items-center justify-center">
+                <div className="flex items-center gap-2 md:gap-8">
+                  <div className="md:text-xl flex flex-col gap-2 items-center justify-center">
                     <span>{match.score.home}</span>
                     <span>{match.score.away}</span>
                   </div>
@@ -672,9 +672,9 @@ export function MiniMatchesTable() {
           : matches.upcomingMatches.map((match) => (
               <div
                 key={match.id}
-                className="w-full px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
+                className="w-full md:px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
               >
-                <div className="flex items-center gap-8">
+                <div className="flex items-center gap-1 md:gap-8">
                   <div className="flex flex-col items-center justify-center">
                     <p>
                       {`${new Date(match.startTime)
@@ -686,12 +686,12 @@ export function MiniMatchesTable() {
                         .padStart(2, "0")}`}
                     </p>
                   </div>
-                  <div className="text-xl flex flex-col gap-2 justify-center">
+                  <div className="md:text-xl flex flex-col gap-2 justify-center">
                     <span>{match.homeTeam}</span>
                     <span>{match.awayTeam}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-8">
+                <div className="flex items-center gap-1 md:gap-8">
                   <div className="text-xl flex flex-col gap-2 items-center justify-center">
                     <span>-</span>
                     <span>-</span>

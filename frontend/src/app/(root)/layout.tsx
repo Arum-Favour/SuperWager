@@ -16,7 +16,7 @@ export default function RootLayout({
         <Toaster position="top-right" richColors />
         <main className="relative">
           <Navbar />
-          <div className="w-full min-h-screen p-[5%] flex gap-16 max-w-screen-2xl mx-auto">
+          <div className="w-full min-h-screen p-[5%] flex gap-20 justify-between max-w-screen-3xl mx-auto">
             <div className="flex-[75%]">{children}</div>
             <Aside />
           </div>
