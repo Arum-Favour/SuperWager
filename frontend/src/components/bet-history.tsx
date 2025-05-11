@@ -1,8 +1,6 @@
 "use client";
 
 import soccer from "@/assets/images/soccer.png";
-import CancelXIcon from "@/assets/svgs/cancel-x";
-import EditIcon from "@/assets/svgs/edit-icon";
 import GreenCheckIcon from "@/assets/svgs/green-check";
 import { PendingIconBlack, PendingIconBlue } from "@/assets/svgs/pending";
 import RedXIcon from "@/assets/svgs/red-x";
@@ -12,9 +10,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function BetHistory() {
-  const history: GameState[] = JSON.parse(
-    localStorage.getItem("history") || "[]"
-  );
+  const [history, setHistory] = useState<GameState[]>([]);
+
+  useEffect(() => {
+    setHistory(JSON.parse(localStorage.getItem("history") || "[]"));
+  }, []);
 
   const {
     slips,
