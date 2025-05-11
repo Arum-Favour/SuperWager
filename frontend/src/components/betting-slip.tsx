@@ -24,9 +24,7 @@ export default function BettingSlip() {
     hasPoolEnded,
     hasWon,
     setHasEnteredPool,
-    removeSlip,
     updateSlipStatus,
-    updateGameOutcome,
     resetSlip,
   } = useBettingSlips();
 
@@ -67,17 +65,14 @@ export default function BettingSlip() {
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    if (!scoresData?.length || hasPoolEnded) return;
+    if (!scoresData.length || hasPoolEnded) return;
 
     const checkPoolEnded = () => {
       const hasPoolEnded = scoresData.every(
         (match) => match?.sport_event_status.match_status === "ended"
       );
 
-      if (hasPoolEnded) {
-        updateSlipStatus(hasPoolEnded);
-        clearInterval(intervalId);
-      }
+      if (hasPoolEnded) updateSlipStatus(hasPoolEnded);
     };
 
     checkPoolEnded();
@@ -86,9 +81,7 @@ export default function BettingSlip() {
   }, [scoresData, hasPoolEnded]);
 
   useEffect(() => {
-    if (!(hasPoolEnded && hasWon === "pending" && slips)) return;
-
-    resetSlip();
+    if (hasPoolEnded && hasWon !== "pending" && slips.length > 0) resetSlip();
   }, [hasPoolEnded, hasWon, slips]);
 
   useEffect(() => {
@@ -230,15 +223,7 @@ export default function BettingSlip() {
 
         <div className="flex flex-col gap-6">
           {slips.map((game, i) => (
-            <SlipCard
-              key={i}
-              idx={i}
-              game={game}
-              hasPoolStarted={hasPoolStarted}
-              removeSlip={removeSlip}
-              updateGameOutcome={updateGameOutcome}
-              scoresData={scoresData}
-            />
+            <SlipCard key={i} idx={i} game={game} scoresData={scoresData} />
           ))}
         </div>
       </div>

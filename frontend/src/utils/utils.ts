@@ -1,6 +1,3 @@
-export const buildScoresUrl = (league_key: LeagueKey, days: number = 1) =>
-  `https://api.the-odds-api.com/v4/sports/${league_key}/scores?apiKey=${process.env.NEXT_PUBLIC_ODDS_API_KEY}&daysFrom=${days}&dateFormat=iso`;
-
 export const buildMatchesUrl = (season_id: string) =>
   `https://api.sportradar.com/soccer/trial/v4/en/seasons/${season_id}/schedules.json`;
 export const buildOddsUrl = (tournament_id: string) =>

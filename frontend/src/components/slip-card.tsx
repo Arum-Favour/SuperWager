@@ -4,6 +4,7 @@ import EditIcon from "@/assets/svgs/edit-icon";
 import GreenCheckIcon from "@/assets/svgs/green-check";
 import { PendingIconBlack, PendingIconBlue } from "@/assets/svgs/pending";
 import RedXIcon from "@/assets/svgs/red-x";
+import { useBettingSlips } from "@/context/useBettingSlips";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -11,28 +12,21 @@ import { useEffect, useState } from "react";
 export default function SlipCard({
   game,
   scoresData,
-  hasPoolStarted,
   idx,
-  updateGameOutcome,
-  removeSlip,
 }: {
   game: BettingSlip;
   scoresData: Schedule[];
-  hasPoolStarted: boolean;
   idx: number;
-  updateGameOutcome: (
-    outcome: MatchOutcome,
-    i: number,
-    finalHomeScore: number,
-    finalAwayScore: number
-  ) => void;
-  removeSlip: (game: BettingSlip) => void;
 }) {
   const router = useRouter();
+
+  const { hasPoolStarted, removeSlip, updateGameOutcome } = useBettingSlips();
 
   const [matchOutcome, setMatchOutcome] = useState<MatchOutcome>("pending");
 
   useEffect(() => {
+    if (!scoresData.length) return;
+
     const match = scoresData[idx];
 
     const homeScore = match?.sport_event_status.home_score as number;
