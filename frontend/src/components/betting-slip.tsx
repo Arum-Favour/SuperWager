@@ -81,7 +81,7 @@ export default function BettingSlip() {
   }, [scoresData, hasPoolEnded]);
 
   useEffect(() => {
-    if (hasPoolEnded && hasWon !== "pending" && slips.length > 0) resetSlip();
+    if (hasPoolEnded && hasWon === "pending" && slips.length > 0) resetSlip();
   }, [hasPoolEnded, hasWon, slips]);
 
   useEffect(() => {
