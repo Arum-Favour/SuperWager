@@ -88,7 +88,7 @@ export default function BetHistory() {
           >
             All
             <span className="py-0.5 px-2.5 rounded-md bg-[#F2F9FF] text-black/50">
-              {history.length + slips.length}
+              {history.length + (slips.length ? 1 : 0)}
             </span>
           </h4>
           <h4
@@ -99,7 +99,7 @@ export default function BetHistory() {
           >
             Ongoing
             <span className="py-0.5 px-2.5 rounded-md bg-[#F2F9FF] text-black/50">
-              {slips.length}
+              {slips.length ? "1" : "0"}
             </span>
           </h4>
           <h4
