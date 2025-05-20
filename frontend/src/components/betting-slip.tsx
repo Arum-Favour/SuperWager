@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 import { toast } from "sonner";
 import SlipCard from "./slip-card";
+import Loader from "./loader";
 
 export default function BettingSlip() {
   const router = useRouter();
@@ -25,6 +26,7 @@ export default function BettingSlip() {
     hasWon,
     setHasEnteredPool,
     updateSlipStatus,
+    setSlipOutcome,
     resetSlip,
   } = useBettingSlips();
 
@@ -37,7 +39,7 @@ export default function BettingSlip() {
       setBetslipLeagues([...new Set(slips.map((slip) => slip.league_key))]);
   }, [slips]);
 
-  const { data: scoresData = [] } = useQuery({
+  const { data: scoresData = [], isLoading } = useQuery({
     queryKey: ["scores", betslipLeagues],
     queryFn: async () => {
       const results = await Promise.all(
@@ -81,7 +83,8 @@ export default function BettingSlip() {
   }, [scoresData, hasPoolEnded]);
 
   useEffect(() => {
-    if (hasPoolEnded && hasWon === "pending" && slips.length > 0) resetSlip();
+    if (hasPoolEnded && hasWon === "pending" && slips.length > 0)
+      setSlipOutcome();
   }, [hasPoolEnded, hasWon, slips]);
 
   useEffect(() => {
@@ -109,12 +112,21 @@ export default function BettingSlip() {
             <p className="text-xl font-semibold">
               You {hasWon === "lost" ? "Lose" : "Won"}
             </p>
+            <button
+              onClick={resetSlip}
+              className="text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-4 text-white capitalize hover:bg-[var(--primary)]/80"
+            >
+              Next
+            </button>
           </div>
         </div>
       )}
       {showEnterPoolModal && (
         <div className="fixed inset-0 items-center justify-center flex z-50">
-          <div className="absolute inset-0 bg-black/50" />
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowEnterPoolModal(false)}
+          />
           <div className="bg-white rounded-[20px] p-10 relative flex flex-col items-center justify-center gap-10">
             <div className="flex w-full flex-col gap-6">
               <div className="flex justify-between items-center gap-10">
@@ -222,9 +234,15 @@ export default function BettingSlip() {
         </div>
 
         <div className="flex flex-col gap-6">
-          {slips.map((game, i) => (
-            <SlipCard key={i} idx={i} game={game} scoresData={scoresData} />
-          ))}
+          {isLoading ? (
+            <div className="w-full p-8 flex items-center justify-center">
+              <Loader />
+            </div>
+          ) : (
+            slips.map((game, i) => (
+              <SlipCard key={i} idx={i} game={game} scoresData={scoresData} />
+            ))
+          )}
         </div>
       </div>
     </>
