@@ -25,7 +25,7 @@ export default function Navbar() {
             { label: "Leaderboard", href: "/leaderboard" },
             { label: "Player Support", href: "/player-support" },
             { label: "Contact", href: "/contact" },
-            { label: "Language", href: "/language" },
+            { label: "Bet Slip", href: "/betting-slips" },
             { label: "Bet History", href: "/bet-history" },
             { label: "Create Slip", href: "/create-slip" },
           ].map((item, i) => (
@@ -73,7 +73,7 @@ export default function Navbar() {
               { label: "Leaderboard", href: "/leaderboard" },
               { label: "Player Support", href: "/player-support" },
               { label: "Contact", href: "/contact" },
-              { label: "Language", href: "/language" },
+              { label: "Bet Slip", href: "/betting-slips" },
               { label: "Bet History", href: "/bet-history" },
               { label: "Create Slip", href: "/create-slip" },
             ].map((item, i) => (
