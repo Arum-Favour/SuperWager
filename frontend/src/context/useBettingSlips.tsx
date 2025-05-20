@@ -22,6 +22,7 @@ const BettingSlipsContext = createContext<
         finalAwayScore: number
       ) => void;
       resetSlip: () => void;
+      setSlipOutcome: () => void;
       slips: BettingSlip[];
       hasEnteredPool: boolean;
       hasPoolStarted: boolean;
@@ -46,7 +47,7 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [gameState, setGameState] = useState<GameState>(initialState);
 
-  const resetSlip = () => {
+  const setSlipOutcome = () => {
     const updatedSlips: GameState = {
       ...gameState,
       hasWon: gameState.slips.some((slip) => slip.outcome === "lost")
@@ -55,15 +56,16 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
     };
 
     setGameState(updatedSlips);
+    localStorage.setItem("game", JSON.stringify(gameState));
+  };
 
-    setTimeout(() => {
-      const history = [
-        updatedSlips,
-        ...JSON.parse(localStorage.getItem("history") || "[]"),
-      ];
+  const resetSlip = () => {
+    const history = [
+      gameState,
+      ...JSON.parse(localStorage.getItem("history") || "[]"),
+    ];
 
-      localStorage.setItem("history", JSON.stringify(history));
-    }, 5000);
+    localStorage.setItem("history", JSON.stringify(history));
 
     setGameState(initialState);
     localStorage.setItem("game", JSON.stringify(initialState));
@@ -160,6 +162,7 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
         updateSlipStatus,
         updateGameOutcome,
         resetSlip,
+        setSlipOutcome,
         ...gameState,
       }}
     >
