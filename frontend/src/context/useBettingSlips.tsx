@@ -52,11 +52,13 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
       ...gameState,
       hasWon: gameState.slips.some((slip) => slip.outcome === "lost")
         ? "lost"
+        : gameState.slips.some((slip) => slip.outcome === "pending")
+        ? "pending"
         : "won",
     };
 
     setGameState(updatedSlips);
-    localStorage.setItem("game", JSON.stringify(gameState));
+    localStorage.setItem("game", JSON.stringify(updatedSlips));
   };
 
   const resetSlip = () => {

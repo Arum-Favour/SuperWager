@@ -35,7 +35,7 @@ export default function BettingSlip() {
   const [betslipLeagues, setBetslipLeagues] = useState<string[]>([]);
 
   useEffect(() => {
-    if (slips)
+    if (slips.length)
       setBetslipLeagues([...new Set(slips.map((slip) => slip.league_key))]);
   }, [slips]);
 
