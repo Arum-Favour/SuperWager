@@ -20,7 +20,7 @@ export default function SlipCard({
 }) {
   const router = useRouter();
 
-  const { hasPoolStarted, removeSlip, updateGameOutcome } = useBettingSlips();
+  const { hasEnteredPool, removeSlip, updateGameOutcome } = useBettingSlips();
 
   const [matchOutcome, setMatchOutcome] = useState<MatchOutcome>("pending");
 
@@ -129,7 +129,7 @@ export default function SlipCard({
           </p>
         </div>
         <div className="flex gap-16">
-          {hasPoolStarted ? (
+          {hasEnteredPool ? (
             <span>
               {matchOutcome === "won" && <GreenCheckIcon />}
               {matchOutcome === "lost" && <RedXIcon />}
