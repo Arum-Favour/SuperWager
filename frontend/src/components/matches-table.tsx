@@ -41,7 +41,7 @@ export default function MatchesTable() {
   } = useBettingSlips();
 
   const addToSlip = (match: BettingSlip) => {
-    if (hasPoolStarted && hasEnteredPool) {
+    if (hasEnteredPool) {
       toast.error("You cannot make changes to the pool");
       return;
     }
@@ -100,7 +100,7 @@ export default function MatchesTable() {
           </span>
         </div>
 
-        {!hasPoolStarted && (
+        {!hasEnteredPool && (
           <button
             onClick={createSlip}
             className="text-lg font-normal bg-[var(--primary)] rounded-lg py-3 px-4 text-white capitalize hover:bg-[var(--primary)]/80"

@@ -1,18 +1,19 @@
 "use client";
 
+import CancelXIcon from "@/assets/svgs/cancel-x";
 import GreaterThan from "@/assets/svgs/double-greaterthan";
 import LessThan from "@/assets/svgs/double-lessthan";
 import { useBettingSlips } from "@/context/useBettingSlips";
 import { fetchMatches } from "@/utils/queries";
 import { useQuery } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { Plus, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 import { toast } from "sonner";
-import SlipCard from "./slip-card";
 import Loader from "./loader";
+import SlipCard from "./slip-card";
 
 export default function BettingSlip() {
   const router = useRouter();
@@ -128,7 +129,19 @@ export default function BettingSlip() {
             onClick={() => setShowEnterPoolModal(false)}
           />
           <div className="bg-white rounded-[20px] p-10 relative flex flex-col items-center justify-center gap-10">
+            <span
+              className="p-2 rounded-full border-2 border-[var(--primary)] absolute top-2 right-2 cursor-pointer"
+              onClick={() => setShowEnterPoolModal(false)}
+            >
+              <CancelXIcon className="size-4 stroke-[var(--primary)]" />
+            </span>
             <div className="flex w-full flex-col gap-6">
+              <div className="flex items-center gap-4 p-1 px-4 border border-red-400 rounded-full">
+                <TriangleAlert color="red" />
+                <p className="text-xl font-semibold">
+                  Once you select pool you cannot edit slip.
+                </p>
+              </div>
               <div className="flex justify-between items-center gap-10">
                 <p className="text-3xl">Enter Pool</p>
                 <div className="rounded-[10px] gap-5 px-6 py-4 bg-[var(--primary-light)] flex items-center justify-center">
@@ -218,7 +231,7 @@ export default function BettingSlip() {
           </div>
 
           <div className="flex flex-col gap-2">
-            {!hasPoolStarted && (
+            {!hasEnteredPool && (
               <button
                 onClick={() => {
                   if (hasEnteredPool) router.push("/create-slip");
@@ -226,7 +239,7 @@ export default function BettingSlip() {
                 }}
                 className="text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-4 text-white capitalize hover:bg-[var(--primary)]/80"
               >
-                {!hasEnteredPool ? "Enter Pool" : "Edit Slip"}
+                Enter Pool
               </button>
             )}
             <p className="self-end">Pool: 0.1 SST</p>
