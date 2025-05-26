@@ -7,7 +7,7 @@ import { useBettingSlips } from "@/context/useBettingSlips";
 import { useMatches } from "@/context/useMatchesContext";
 import { radar_leagues } from "@/utils/constant";
 import { daysArray } from "@/utils/utils";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowDown } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import "react-calendar/dist/Calendar.css";
@@ -15,9 +15,11 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from "sonner";
 import Loader from "./loader";
+import { useState } from "react";
 
 export default function MatchesTable() {
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
 
   const {
     isError,
@@ -29,6 +31,8 @@ export default function MatchesTable() {
     startingDate,
     setStartingDate,
     odds,
+    isOpen: contextIsOpen,
+    setIsOpen: setContextIsOpen,
   } = useMatches();
 
   const {
@@ -84,20 +88,44 @@ export default function MatchesTable() {
     <div className="w-full flex flex-col gap-4">
       <div className="w-full flex items-center justify-between gap-8">
         <h2 className="text-4xl">Football</h2>
-        <div className="flex items-center justify-center gap-8">
-          <span
-            className="cursor-pointer p-1 rounded-full hover:bg-[var(--primary-light)]"
-            onClick={prev}
+        <div className="flex items-center justify-center relative">
+          <div
+            onClick={() => setIsOpen(!isOpen)}
+            className="text-xl font-medium cursor-pointer flex items-center gap-2"
           >
-            <ArrowLeft className="size-6 stroke-[var(--primary)]" />
-          </span>
-          <p className="text-xl font-semibold">{radar_leagues[league].name}</p>
-          <span
-            className="cursor-pointer p-1 rounded-full hover:bg-[var(--primary-light)]"
-            onClick={next}
-          >
-            <ArrowRight className="size-6 stroke-[var(--primary)]" />
-          </span>
+            {radar_leagues[league].name}
+            <span
+              className={`transform transition-transform duration-200 ${
+                isOpen ? "rotate-180" : ""
+              }`}
+            >
+              <ArrowDown className="size-4 stroke-[var(--primary)]" />
+            </span>
+          </div>
+
+          {isOpen && (
+            <div
+              className="absolute top-full mt-2 bg-white rounded-lg shadow-lg py-2 w-48 z-50
+                transition-all duration-200 ease-out
+                transform origin-top
+                animate-in fade-in slide-in-from-top-2"
+            >
+              {Object.entries(radar_leagues).map(([key, value]) => (
+                <div
+                  key={key}
+                  onClick={() => {
+                    const newLeague = parseInt(key);
+                    if (newLeague < league) prev();
+                    else next();
+                    setIsOpen(false);
+                  }}
+                  className="px-4 py-2 hover:bg-[var(--primary-light)] cursor-pointer text-lg"
+                >
+                  {value.name}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {!hasEnteredPool && (
@@ -493,22 +521,22 @@ export function MiniMatchesTable() {
       <div className="w-full flex flex-col gap-4">
         <div className="w-full flex items-center justify-between gap-8">
           <h2 className="text-4xl">Football</h2>
-          <div className="flex items-center justify-center gap-8">
-            <span
-              className="cursor-pointer p-1 rounded-full hover:bg-[var(--primary-light)]"
-              onClick={prev}
+          <div className="flex items-center justify-center">
+            <select
+              value={league}
+              onChange={(e) => {
+                const newLeague = parseInt(e.target.value);
+                if (newLeague < league) prev();
+                else next();
+              }}
+              className="text-xl font-semibold bg-transparent border-none focus:outline-none cursor-pointer"
             >
-              <ArrowLeft className="size-6 stroke-[var(--primary)]" />
-            </span>
-            <p className="text-xl font-semibold">
-              {radar_leagues[league].name}
-            </p>
-            <span
-              className="cursor-pointer p-1 rounded-full hover:bg-[var(--primary-light)]"
-              onClick={next}
-            >
-              <ArrowRight className="size-6 stroke-[var(--primary)]" />
-            </span>
+              {Object.entries(radar_leagues).map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
