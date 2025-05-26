@@ -1,17 +1,20 @@
 "use client";
 
+import { useAuthModal } from "@/context/AuthModalContext";
 import { CircleX, Menu } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { useAuthModal } from "@/context/AuthModalContext";
+import UserProfile from "./user-profile";
 
 export default function Navbar() {
   const [showNav, setShowNav] = useState(false);
   const { openModal, user } = useAuthModal();
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <header className="w-full max-w-screen-2xl mx-auto px-[5%] flex items-center justify-center">
-      <div className="py-4 w-full flex items-center justify-between gap-4 max-w-screen-3xl overflow-x-hidden z-50">
+      <div className="py-4 w-full flex items-center justify-between gap-4 max-w-screen-2xl">
         <div className="flex-shrink-0">
           <Link href={"/"}>
             <h1 className="text-xl font-bold text-[var(--primary)] inknut-antiqua">
@@ -38,16 +41,10 @@ export default function Navbar() {
             </Link>
           ))}
         </nav>
-        {!user && (
-          <div className="hidden xl:flex items-center gap-4">
-            <button
-              onClick={openModal}
-              className="bg-white border-[var(--primary)] border-[2px] rounded-[4px] text-[var(--primary)] p-2.5 px-4 font-medium text-base transition-all cursor-pointer hover:bg-white/80"
-            >
-              Log in
-            </button>
-          </div>
-        )}
+
+        <div className="hidden xl:block">
+          <UserProfile />
+        </div>
 
         <span
           className="xl:hidden cursor-pointer"

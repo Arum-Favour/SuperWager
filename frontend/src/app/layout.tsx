@@ -1,13 +1,13 @@
-import Aside from "@/components/aside";
-import AuthModalWrapper from "@/components/AuthModalWrapper";
 import Navbar from "@/components/navbar";
 import { AuthModalProvider } from "@/context/AuthModalContext";
 import { BettingSlipsProvider } from "@/context/useBettingSlips";
 import { MatchesProvider } from "@/context/useMatchesContext";
+import { PrivyProvider } from "@/providers/PrivyProvider";
 import QueryProvider from "@/providers/QueryProvider";
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
 import "./globals.css";
+import Aside from "@/components/aside";
 
 export const metadata: Metadata = {
   title: "SuperWager",
@@ -22,23 +22,24 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <QueryProvider>
-          <AuthModalProvider>
-            <MatchesProvider>
-              <BettingSlipsProvider>
-                <Toaster position="top-right" richColors />
-                <main className="relative">
-                  <Navbar />
-                  <div className="w-full min-h-screen p-[5%] flex gap-16 max-w-screen-2xl mx-auto">
-                    <div className="flex-[80%]">{children}</div>
-                    <Aside />
-                  </div>
-                  <AuthModalWrapper />
-                </main>
-              </BettingSlipsProvider>
-            </MatchesProvider>
-          </AuthModalProvider>
-        </QueryProvider>
+        <PrivyProvider>
+          <QueryProvider>
+            <AuthModalProvider>
+              <MatchesProvider>
+                <BettingSlipsProvider>
+                  <Toaster position="top-right" richColors />
+                  <main className="relative">
+                    <Navbar />
+                    <div className="w-full min-h-screen p-[5%] flex gap-16 max-w-screen-2xl mx-auto">
+                      <div className="flex-[80%]">{children}</div>
+                      <Aside />
+                    </div>
+                  </main>
+                </BettingSlipsProvider>
+              </MatchesProvider>
+            </AuthModalProvider>
+          </QueryProvider>
+        </PrivyProvider>
       </body>
     </html>
   );
