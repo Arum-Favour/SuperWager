@@ -96,79 +96,95 @@ export default function LeaderboardTable() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center gap-6 bg-[var(--primary-light)] p-6 md:px-8 rounded-2xl">
-      <div className="w-full items-center flex justify-between">
-        <div className="flex flex-col gap-1">
-          <div className="flex gap-4 items-center">
-            <h2 className="text-3xl font-normal">Weekly Leaderboard</h2>
-            <p className="text-[#32FF40] text-2xl">2D: 06H: 37M: 12S</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <p className="flex items-center gap-2">
-              <span className="size-2.5 bg-[#32ff40] rounded-full" />
-              <span>Total Players: 1,879</span>
-            </p>
-            <p>Updated 1 hour ago</p>
-          </div>
+    <div className="flex flex-col justify-center gap-6 bg-[var(--primary-light)] p-6 md:px-8 rounded-2xl">
+      <div className="flex gap-4 items-center">
+        <h2 className="text-base sm:text-xl md:text-2xl lg:text-3xl text-[var(--primary)] font-normal">
+          Weekly Leaderboard
+        </h2>
+        <p className="text-[#32FF40] text-base md:text-2xl">
+          2D: 06H: 37M: 12S
+        </p>
+      </div>
+      <div className="w-full items-center flex justify-between gap-8">
+        <div className="flex items-center gap-x-4 gap-y-2 flex-wrap text-xs sm:text-sm md:text-base">
+          <p className="flex items-center gap-2">
+            <span className="size-2 md:size-2.5 bg-[#32ff40] rounded-full" />
+            <span className="text-sm md:text-base">Total Players: 1,879</span>
+          </p>
+          <p>Updated 1 hour ago</p>
         </div>
-        <div className="flex flex-col gap-1">
-          <h4 className="text-xl font-normal">Pool (STT)</h4>
+
+        <div className="flex flex-col items-center gap-1">
+          <h4 className="text-sm sm:text-base md:text-xl font-normal">
+            Pool (STT)
+          </h4>
           <div className="flex items-center justify-center gap-4">
-            <LessThan className="size-6 cursor-pointer" />
-            <h4 className="text-2xl font-normal">0.1</h4>
-            <GreaterThan className="size-6 cursor-pointer" />
+            <LessThan className="size-4 md:size-6 cursor-pointer" />
+            <h4 className="text-base sm:text-xl md:text-2xl font-normal">
+              0.1
+            </h4>
+            <GreaterThan className="size-4 md:size-6 cursor-pointer" />
           </div>
         </div>
       </div>
       <table className="w-full">
         <thead>
           <tr>
-            <th className="p-2 font-normal text-center">Position</th>
-            <th className="p-2 font-normal text-center">Players</th>
-            <th className="p-2 font-normal text-center">
+            <th className="py-2 font-normal text-xs md:text-base md:text-center">
+              Position
+            </th>
+            <th className="py-2 font-normal text-xs md:text-base md:text-center">
+              Players
+            </th>
+            <th className="py-2 font-normal text-xs md:text-base md:text-center">
               Odds Won <span className="text-black/50">(Point)</span>
             </th>
-            <th className="p-2 font-normal text-center">
+            <th className="py-2 font-normal text-xs md:text-base md:text-center">
               Accuracy <span className="text-black/50">(Point)</span>
             </th>
-            <th className="p-2 font-normal text-center">Total Points</th>
+            <th className="py-2 font-normal text-xs md:text-base md:text-center">
+              Total Points
+            </th>
           </tr>
         </thead>
         <tbody>
           {leaderboardData.map((player, i) => (
             <tr
               key={i}
-              className={`${i == 0 ? "text-[var(--primary)]" : "text-black"}`}
+              className={`${
+                i == 0 ? "text-[var(--primary)]" : "text-black"
+              } text-sm md:text-base`}
             >
-              <td className="p-2 py-4 text-center border-b border-b-[var(--primary)]/30">
+              <td className="md:p-2 px-1 py-2 md:py-4 md:text-center border-b border-b-[var(--primary)]/30">
                 {i + 1}
               </td>
-              <td className="p-2 py-4 text-center border-b border-b-[var(--primary)]/30">
-                {player.name}
+              <td className="md:p-2 px-1 py-2 md:py-4 md:text-center border-b border-b-[var(--primary)]/30">
+                <span className="hidden md:block">{player.name}</span>
+                <span className="md:hidden">{player.name.split(" ")[0]}</span>
               </td>
-              <td className="p-2 py-4 text-center border-b border-b-[var(--primary)]/30">
+              <td className="md:p-2 px-1 py-2 md:py-4 md:text-center border-b border-b-[var(--primary)]/30">
                 {player.totalOdds.odds.toFixed(1)}{" "}
                 <span className="text-black/50">
                   ({player.totalOdds.points.toFixed(1)})
                 </span>
               </td>
-              <td className="p-2 py-4 text-center border-b border-b-[var(--primary)]/30">
+              <td className="md:p-2 px-1 py-2 md:py-4 md:text-center border-b border-b-[var(--primary)]/30">
                 {player.accuracy.accuracy.toFixed(1)}
                 <span className="text-black/50">
                   ({player.accuracy.points.toFixed(1)})
                 </span>
               </td>
-              <td className="p-2 py-4 text-center border-b border-b-[var(--primary)]/30">
+              <td className="md:p-2 px-1 py-2 md:py-4 md:text-center border-b border-b-[var(--primary)]/30">
                 {player.totalPoints.toFixed(1)}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <div>
+      <div className="flex justify-center items-center w-full">
         <button
           onClick={openModal}
-          className="text-lg font-normal bg-[var(--primary)] rounded-lg p-3.5 text-white capitalize hover:bg-[var(--primary)]/80"
+          className="text-base md:text-lg font-normal bg-[var(--primary)] rounded-lg p-3.5 text-white capitalize hover:bg-[var(--primary)]/80 w-full md:w-auto"
         >
           See Full Leaderboard
         </button>

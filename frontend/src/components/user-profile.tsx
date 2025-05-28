@@ -1,10 +1,6 @@
-import {
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  Transition,
-} from "@headlessui/react";
+"use client";
+
+import { Menu, MenuButton, MenuItems, Transition } from "@headlessui/react";
 import {
   ArrowDownTrayIcon,
   ClipboardDocumentIcon,
@@ -15,9 +11,7 @@ import {
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { ethers } from "ethers";
 import {
-  ArrowBigDown,
   ChevronDownIcon,
-  PencilIcon,
   PlusIcon,
   UserCircleIcon,
   WalletIcon,
@@ -192,7 +186,7 @@ export default function UserProfile() {
       <>
         <button
           onClick={() => setIsLoginModalOpen(true)}
-          className="bg-white border-[var(--primary)] border-[2px] rounded-[4px] text-[var(--primary)] p-2.5 px-4 font-medium text-base transition-all cursor-pointer hover:bg-white/80"
+          className="bg-white border-[var(--primary)] border-[2px] rounded-[4px] text-[var(--primary)] py-1 px-2.5 sm:py-2.5 sm:px-4 font-medium text-base transition-all cursor-pointer hover:bg-white/80"
         >
           Log in
         </button>
@@ -208,10 +202,13 @@ export default function UserProfile() {
   return (
     <>
       <Menu as="div" className="relative z-[999]">
-        <MenuButton className="flex items-center gap-2 text-sm font-medium">
-          <UserCircleIcon className="size-8" />
-          {getDisplayName()}
-          <ChevronDownIcon className="size-6" />
+        <MenuButton className="flex items-center gap-2 text-sm font-medium border border-[var(--primary)] p-1 rounded-sm md:border-none">
+          <UserCircleIcon className="size-6 md:size-8" />
+          <span className="hidden md:block">{getDisplayName()}</span>
+          <ChevronDownIcon className="hidden md:flex size-6" />
+          <span className="flex md:hidden text-[var(--primary)]">
+            {balance} SST
+          </span>
         </MenuButton>
 
         <Transition
