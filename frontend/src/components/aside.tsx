@@ -19,7 +19,7 @@ import UserCard from "./user-card";
 
 export default function Aside() {
   return (
-    <aside className="min-h-screen flex flex-col space-y-16 justify-between">
+    <aside className="hidden lg:flex min-h-screen flex-col space-y-16 justify-between">
       <UserCard />
       <div className="h-full justify-between items-center flex flex-col gap-8">
         <div className="grid grid-cols-3 items-center gap-10 px-8">

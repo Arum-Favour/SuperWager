@@ -31,7 +31,7 @@ export default function RootLayout({
                   <main className="relative">
                     <Navbar />
                     <div className="w-full min-h-screen p-[5%] flex gap-16 max-w-screen-2xl mx-auto">
-                      <div className="flex-[80%]">{children}</div>
+                      <div className="flex-1 lg:flex-[80%]">{children}</div>
                       <Aside />
                     </div>
                   </main>
