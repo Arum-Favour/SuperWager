@@ -18,6 +18,7 @@ import Image from "next/image";
 import UserCard from "./user-card";
 
 export default function Aside() {
+  return null;
   return (
     <aside className="hidden lg:flex min-h-screen flex-col space-y-16 justify-between">
       <UserCard />
