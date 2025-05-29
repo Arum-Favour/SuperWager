@@ -95,7 +95,7 @@ export default function UserCard() {
             href={"/create-slip"}
             className="flex flex-col gap-4 items-center"
           >
-            <PlayIcon />
+            <PlayIcon className="fill-[var(--primary)]" />
             <p>Create Slip</p>
           </Link>
           <Link

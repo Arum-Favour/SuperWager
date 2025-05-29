@@ -1,8 +1,6 @@
 "use client";
 
 import CalendarIcon from "@/assets/svgs/calendar";
-import FootballPitchIcon from "@/assets/svgs/football-pitch";
-import GreaterThanIcon from "@/assets/svgs/greater-than";
 import { useBettingSlips } from "@/context/useBettingSlips";
 import { useMatches } from "@/context/useMatchesContext";
 import { radar_leagues } from "@/utils/constant";
@@ -82,8 +80,10 @@ export default function MatchesTable() {
   return (
     <div className="w-full flex flex-col gap-4">
       <div className="w-full flex items-center justify-between gap-8">
-        <h2 className="text-4xl">Football</h2>
-        <div className="flex items-center justify-center">
+        <h2 className="text-base sm:text-xl md:text-3xl lg:text-4xl">
+          Football
+        </h2>
+        <div className="hidden lg:flex items-center justify-center">
           <select
             value={league}
             onChange={(e) => {
@@ -91,7 +91,7 @@ export default function MatchesTable() {
               if (newLeague < league) prev();
               else next();
             }}
-            className="text-xl font-semibold bg-transparent border-none focus:outline-none cursor-pointer"
+            className="text-sm sm:text-lg md:text-xl font-semibold bg-transparent border-none focus:outline-none cursor-pointer"
           >
             {Object.entries(radar_leagues).map(([key, value]) => (
               <option key={key} value={key}>
@@ -104,14 +104,32 @@ export default function MatchesTable() {
         {!hasEnteredPool && (
           <button
             onClick={createSlip}
-            className="text-lg font-normal bg-[var(--primary)] rounded-lg py-3 px-4 text-white capitalize hover:bg-[var(--primary)]/80"
+            className="text-base md:text-lg font-normal bg-[var(--primary)] rounded-lg py-2 md:py-3 px-4 text-white capitalize hover:bg-[var(--primary)]/80"
           >
             Create Slip
           </button>
         )}
       </div>
 
-      <div className="flex w-full items-center overflow-x-auto">
+      <div className="flex lg:hidden items-center justify-center">
+        <select
+          value={league}
+          onChange={(e) => {
+            const newLeague = parseInt(e.target.value);
+            if (newLeague < league) prev();
+            else next();
+          }}
+          className="text-base sm:text-lg md:text-xl font-semibold bg-transparent border-none focus:outline-none cursor-pointer"
+        >
+          {Object.entries(radar_leagues).map(([key, value]) => (
+            <option key={key} value={key}>
+              {value.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="hidden lg:flex w-full items-center overflow-x-auto">
         <>
           {daysArray.map((item, i) => (
             <div
@@ -134,20 +152,33 @@ export default function MatchesTable() {
             </div>
           ))}
 
-          <div>
-            <DatePicker
-              excludeDates={daysArray.map((item) => new Date(item.date))}
-              minDate={new Date()}
-              selected={new Date(startingDate)}
-              onChange={(date) => setStartingDate(date?.toDateString() || "")}
-              customInput={
-                <div className="cursor-pointer px-2">
-                  <CalendarIcon />
-                </div>
-              }
-            />
-          </div>
+          <DatePicker
+            excludeDates={daysArray.map((item) => new Date(item.date))}
+            minDate={new Date()}
+            selected={new Date(startingDate)}
+            onChange={(date) => setStartingDate(date?.toDateString() || "")}
+            customInput={<CalendarIcon className="cursor-pointer px-2" />}
+          />
         </>
+      </div>
+
+      <div className="flex lg:hidden items-center justify-between gap-8 px-4 sm:px-[20px] py-4 bg-[var(--primary-light)]">
+        <div className="flex items-center gap-6">
+          <p className="text-sm">Today</p>
+
+          <DatePicker
+            excludeDates={daysArray.map((item) => new Date(item.date))}
+            minDate={new Date()}
+            selected={new Date(startingDate)}
+            onChange={(date) => setStartingDate(date?.toDateString() || "")}
+            customInput={<CalendarIcon className="size-6 cursor-pointer" />}
+          />
+        </div>
+        <div className="flex items-center justify-center gap-2 xs:gap-4">
+          <p className="text-sm w-8 md:w-12 text-center">1</p>
+          <p className="text-sm w-8 md:w-12 text-center">X</p>
+          <p className="text-sm w-8 md:w-12 text-center">2</p>
+        </div>
       </div>
 
       {isLoading && (
@@ -175,11 +206,63 @@ export default function MatchesTable() {
           matches.map((match, i) => (
             <div
               key={i}
-              className="w-full px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
+              className="w-full px-4 sm:px-6 md:px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
             >
               <div className="flex items-center gap-8">
-                <div className="flex flex-col items-center justify-center">
-                  <p className="flex flex-col items-center justify-center gap-1 w-20">
+                <p className="hidden lg:flex flex-col items-center justify-center gap-1 w-20">
+                  {match.sport_event_status.match_status === "ended" ? (
+                    "FT"
+                  ) : (
+                    <>
+                      {match.sport_event_status.status === "live" ? (
+                        <>
+                          <span className="text-[#32FF40]">
+                            {match.sport_event_status.clock?.played}
+                          </span>
+                          <span className="capitalize text-[#32FF40]">
+                            {match.sport_event_status.match_status ===
+                            "1st_half"
+                              ? "1st"
+                              : match.sport_event_status.match_status ===
+                                "halftime"
+                              ? "HT"
+                              : "2nd"}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <span>
+                            {new Date(
+                              match.sport_event.start_time
+                            ).toLocaleDateString("en-GB", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "2-digit",
+                            })}
+                          </span>
+                          <span>
+                            {`${new Date(match.sport_event.start_time)
+                              .getHours()
+                              .toString()
+                              .padStart(2, "0")}:${new Date(
+                              match.sport_event.start_time
+                            )
+                              .getMinutes()
+                              .toString()
+                              .padStart(2, "0")}`}
+                          </span>
+                        </>
+                      )}
+                    </>
+                  )}
+                </p>
+
+                <div className="flex flex-col gap-2">
+                  <div className="text-xs xs:text-sm sm:text-base md:text-xl flex flex-col gap-2 justify-center">
+                    <span>{match.sport_event.competitors[0].name}</span>
+                    <span>{match.sport_event.competitors[1].name}</span>
+                  </div>
+                  <p className="lg:hidden text-sm flex items-center gap-1">
                     {match.sport_event_status.match_status === "ended" ? (
                       "FT"
                     ) : (
@@ -227,13 +310,9 @@ export default function MatchesTable() {
                     )}
                   </p>
                 </div>
-                <div className="text-xl flex flex-col gap-2 justify-center">
-                  <span>{match.sport_event.competitors[0].name}</span>
-                  <span>{match.sport_event.competitors[1].name}</span>
-                </div>
               </div>
-              <div className="flex items-center gap-8">
-                <div className="text-xl flex flex-col gap-2 items-center justify-center">
+              <div className="flex items-center gap-4 md:gap-8">
+                <div className="text-xs xs:text-sm sm:text-base md:text-xl flex flex-col gap-2 items-center justify-center">
                   <span>
                     {match.sport_event_status.status === "not_started"
                       ? "-"
@@ -245,12 +324,10 @@ export default function MatchesTable() {
                       : match.sport_event_status.away_score}
                   </span>
                 </div>
-                <span>
-                  <FootballPitchIcon />
-                </span>
-                <div className="flex items-center gap-4 [&>div>p:nth-child(2)]:cursor-pointer">
+
+                <div className="flex items-center gap-2 xs:gap-4 [&>div>p:nth-child(2)]:cursor-pointer">
                   <div className="flex items-center flex-col gap-1 justify-center">
-                    <p className="text-sm">1</p>
+                    <p className="text-sm hidden lg:block">1</p>
                     <p
                       className={`${
                         slips.find(
@@ -263,7 +340,7 @@ export default function MatchesTable() {
                         )
                           ? "bg-[var(--primary)] text-white"
                           : "bg-[var(--primary-light)]"
-                      } p-2.5 rounded-sm w-12 flex items-center justify-center`}
+                      } p-2.5 rounded-sm w-8 md:w-12 flex items-center justify-center`}
                       onClick={() => {
                         if (match.sport_event_status.match_status === "ended") {
                           toast.error("Match ended, cannot add match to slip");
@@ -315,13 +392,13 @@ export default function MatchesTable() {
                               foundEvent?.markets[0].books[0].outcomes[0].odds;
                             return oddsValue
                               ? parseFloat(oddsValue).toFixed(2)
-                              : "---";
+                              : "-";
                           })()
-                        : "---"}
+                        : "-"}
                     </p>
                   </div>
                   <div className="flex items-center flex-col gap-1 justify-center">
-                    <p className="text-sm">X</p>
+                    <p className="text-sm hidden lg:block">X</p>
                     <p
                       className={`${
                         slips.find(
@@ -334,7 +411,7 @@ export default function MatchesTable() {
                         )
                           ? "bg-[var(--primary)] text-white"
                           : "bg-[var(--primary-light)]"
-                      } p-2.5 rounded-sm w-12 flex items-center justify-center`}
+                      } p-2.5 rounded-sm w-8 md:w-12 flex items-center justify-center`}
                       onClick={() => {
                         if (match.sport_event_status.match_status === "ended") {
                           toast.error("Match ended, cannot add match to slip");
@@ -387,13 +464,13 @@ export default function MatchesTable() {
                                 ?.outcomes?.[1]?.odds;
                             return oddsValue
                               ? parseFloat(oddsValue).toFixed(2)
-                              : "---";
+                              : "-";
                           })()
-                        : "---"}
+                        : "-"}
                     </p>
                   </div>
                   <div className="flex items-center flex-col gap-1 justify-center">
-                    <p className="text-sm">2</p>
+                    <p className="text-sm hidden lg:block">2</p>
                     <p
                       className={`${
                         slips.find(
@@ -406,7 +483,7 @@ export default function MatchesTable() {
                         )
                           ? "bg-[var(--primary)] text-white"
                           : "bg-[var(--primary-light)]"
-                      } p-2.5 rounded-sm w-12 flex items-center justify-center`}
+                      } p-2.5 rounded-sm w-8 md:w-12 flex items-center justify-center`}
                       onClick={() => {
                         if (match.sport_event_status.match_status === "ended") {
                           toast.error("Match ended, cannot add match to slip");
@@ -459,15 +536,12 @@ export default function MatchesTable() {
                                 ?.outcomes?.[2]?.odds;
                             return oddsValue
                               ? parseFloat(oddsValue).toFixed(2)
-                              : "---";
+                              : "-";
                           })()
-                        : "---"}
+                        : "-"}
                     </p>
                   </div>
                 </div>
-                <span className="cursor-pointer">
-                  <GreaterThanIcon />
-                </span>
               </div>
             </div>
           ))}
@@ -492,28 +566,11 @@ export function MiniMatchesTable() {
   return (
     <Link href={"/create-slip"}>
       <div className="w-full flex flex-col gap-4">
-        <div className="w-full flex items-center justify-between gap-8">
-          <h2 className="text-4xl">Football</h2>
-          <div className="flex items-center justify-center">
-            <select
-              value={league}
-              onChange={(e) => {
-                const newLeague = parseInt(e.target.value);
-                if (newLeague < league) prev();
-                else next();
-              }}
-              className="text-xl font-semibold bg-transparent border-none focus:outline-none cursor-pointer"
-            >
-              {Object.entries(radar_leagues).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+        <h2 className="text-base sm:text-xl md:text-3xl lg:text-4xl">
+          Football
+        </h2>
 
-        <div className="flex w-full overflow-x-auto">
+        <div className="hidden lg:flex w-full overflow-x-auto">
           {daysArray.map((item, i) => (
             <div
               key={i}
@@ -532,6 +589,15 @@ export function MiniMatchesTable() {
               )}
             </div>
           ))}
+        </div>
+
+        <div className="flex lg:hidden items-center justify-between gap-8 px-4 sm:px-[20px] py-4 bg-[var(--primary-light)]">
+          <p className="text-sm">Today</p>
+          <div className="flex items-center justify-center gap-2 xs:gap-4">
+            <p className="text-sm w-8 md:w-12 text-center">1</p>
+            <p className="text-sm w-8 md:w-12 text-center">X</p>
+            <p className="text-sm w-8 md:w-12 text-center">2</p>
+          </div>
         </div>
 
         {isLoading && (
@@ -559,11 +625,63 @@ export function MiniMatchesTable() {
             matches.map((match, i) => (
               <div
                 key={i}
-                className="w-full px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
+                className="w-full px-4 sm:px-6 md:px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
               >
                 <div className="flex items-center gap-8">
-                  <div className="flex flex-col items-center justify-center">
-                    <p className="flex flex-col items-center justify-center gap-1 w-20">
+                  <p className="hidden lg:flex flex-col items-center justify-center gap-1 w-20">
+                    {match.sport_event_status.match_status === "ended" ? (
+                      "FT"
+                    ) : (
+                      <>
+                        {match.sport_event_status.status === "live" ? (
+                          <>
+                            <span className="text-[#32FF40]">
+                              {match.sport_event_status.clock?.played}
+                            </span>
+                            <span className="capitalize text-[#32FF40]">
+                              {match.sport_event_status.match_status ===
+                              "1st_half"
+                                ? "1st"
+                                : match.sport_event_status.match_status ===
+                                  "halftime"
+                                ? "HT"
+                                : "2nd"}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span>
+                              {new Date(
+                                match.sport_event.start_time
+                              ).toLocaleDateString("en-GB", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "2-digit",
+                              })}
+                            </span>
+                            <span>
+                              {`${new Date(match.sport_event.start_time)
+                                .getHours()
+                                .toString()
+                                .padStart(2, "0")}:${new Date(
+                                match.sport_event.start_time
+                              )
+                                .getMinutes()
+                                .toString()
+                                .padStart(2, "0")}`}
+                            </span>
+                          </>
+                        )}
+                      </>
+                    )}
+                  </p>
+
+                  <div className="flex flex-col gap-2">
+                    <div className="text-xs xs:text-sm sm:text-base md:text-xl flex flex-col gap-2 justify-center">
+                      <span>{match.sport_event.competitors[0].name}</span>
+                      <span>{match.sport_event.competitors[1].name}</span>
+                    </div>
+                    <p className="lg:hidden text-sm flex items-center gap-1">
                       {match.sport_event_status.match_status === "ended" ? (
                         "FT"
                       ) : (
@@ -611,13 +729,9 @@ export function MiniMatchesTable() {
                       )}
                     </p>
                   </div>
-                  <div className="text-xl flex flex-col gap-2 justify-center">
-                    <span>{match.sport_event.competitors[0].name}</span>
-                    <span>{match.sport_event.competitors[1].name}</span>
-                  </div>
                 </div>
-                <div className="flex items-center gap-8">
-                  <div className="text-xl flex flex-col gap-2 items-center justify-center">
+                <div className="flex items-center gap-4 md:gap-8">
+                  <div className="text-xs xs:text-sm sm:text-base md:text-xl flex flex-col gap-2 items-center justify-center">
                     <span>
                       {match.sport_event_status.status === "not_started"
                         ? "-"
@@ -629,13 +743,11 @@ export function MiniMatchesTable() {
                         : match.sport_event_status.away_score}
                     </span>
                   </div>
-                  <span>
-                    <FootballPitchIcon />
-                  </span>
-                  <div className="flex items-center gap-4 [&>div>p:nth-child(2)]:cursor-pointer">
+
+                  <div className="flex items-center gap-2 xs:gap-4 [&>div>p:nth-child(2)]:cursor-pointer">
                     <div className="flex items-center flex-col gap-1 justify-center">
-                      <p className="text-sm">1</p>
-                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-12 flex items-center justify-center">
+                      <p className="text-sm hidden lg:block">1</p>
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-8 md:w-12 flex items-center justify-center">
                         {match.sport_event_status.match_status !== "ended"
                           ? (() => {
                               const foundEvent = odds.find(
@@ -650,14 +762,14 @@ export function MiniMatchesTable() {
                                   ?.outcomes?.[0]?.odds;
                               return oddsValue
                                 ? parseFloat(oddsValue).toFixed(2)
-                                : "---";
+                                : "-";
                             })()
-                          : "---"}
+                          : "-"}
                       </p>
                     </div>
                     <div className="flex items-center flex-col gap-1 justify-center">
-                      <p className="text-sm">X</p>
-                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-12 flex items-center justify-center">
+                      <p className="text-sm hidden lg:block">X</p>
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-8 md:w-12 flex items-center justify-center">
                         {match.sport_event_status.match_status !== "ended"
                           ? (() => {
                               const foundEvent = odds.find(
@@ -672,14 +784,14 @@ export function MiniMatchesTable() {
                                   ?.outcomes?.[1]?.odds;
                               return oddsValue
                                 ? parseFloat(oddsValue).toFixed(2)
-                                : "---";
+                                : "-";
                             })()
-                          : "---"}
+                          : "-"}
                       </p>
                     </div>
                     <div className="flex items-center flex-col gap-1 justify-center">
-                      <p className="text-sm">2</p>
-                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-12 flex items-center justify-center">
+                      <p className="text-sm hidden lg:block">2</p>
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-8 md:w-12 flex items-center justify-center">
                         {match.sport_event_status.match_status !== "ended"
                           ? (() => {
                               const foundEvent = odds.find(
@@ -694,15 +806,12 @@ export function MiniMatchesTable() {
                                   ?.outcomes?.[2]?.odds;
                               return oddsValue
                                 ? parseFloat(oddsValue).toFixed(2)
-                                : "---";
+                                : "-";
                             })()
-                          : "---"}
+                          : "-"}
                       </p>
                     </div>
                   </div>
-                  <span className="cursor-pointer">
-                    <GreaterThanIcon />
-                  </span>
                 </div>
               </div>
             ))}

@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import { Toaster } from "sonner";
 import "./globals.css";
 import Aside from "@/components/aside";
+import MobileNav from "@/components/mobile-nav";
 
 export const metadata: Metadata = {
   title: "SuperWager",
@@ -30,10 +31,11 @@ export default function RootLayout({
                   <Toaster position="top-right" richColors />
                   <main className="relative">
                     <Navbar />
-                    <div className="w-full min-h-screen p-[5%] flex gap-16 max-w-screen-2xl mx-auto">
+                    <div className="w-full min-h-screen p-[5%] flex gap-16 max-w-screen-2xl mx-auto mb-16 lg:mb-0">
                       <div className="flex-1 lg:flex-[80%]">{children}</div>
                       <Aside />
                     </div>
+                    <MobileNav />
                   </main>
                 </BettingSlipsProvider>
               </MatchesProvider>

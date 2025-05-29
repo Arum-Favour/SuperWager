@@ -1,8 +1,9 @@
 import React from "react";
 
-export default function CalendarIcon() {
+export default function CalendarIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
+      {...props}
       width="33"
       height="33"
       viewBox="0 0 33 33"

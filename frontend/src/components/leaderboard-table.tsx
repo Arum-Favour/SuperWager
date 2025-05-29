@@ -96,8 +96,8 @@ export default function LeaderboardTable() {
   }, []);
 
   return (
-    <div className="flex flex-col justify-center gap-6 bg-[var(--primary-light)] p-6 md:px-8 rounded-2xl">
-      <div className="flex gap-4 items-center">
+    <div className="flex flex-col justify-center gap-6 bg-[var(--primary-light)] p-4 xs:p-6 md:px-8 rounded-2xl">
+      <div className="flex gap-x-4 gap-y-2 flex-wrap items-center">
         <h2 className="text-base sm:text-xl md:text-2xl lg:text-3xl text-[var(--primary)] font-normal">
           Weekly Leaderboard
         </h2>
