@@ -1,20 +1,15 @@
 "use client";
 
-import CancelXIcon from "@/assets/svgs/cancel-x";
-import GreaterThan from "@/assets/svgs/double-greaterthan";
-import LessThan from "@/assets/svgs/double-lessthan";
 import { useBettingSlips } from "@/context/useBettingSlips";
 import { fetchMatches } from "@/utils/queries";
 import { useQuery } from "@tanstack/react-query";
-import { Plus, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Confetti from "react-confetti";
-import { toast } from "sonner";
+import EnterPoolModal from "./enter-pool-modal";
 import Loader from "./loader";
 import SlipCard from "./slip-card";
-import EnterPoolModal from "./enter-pool-modal";
 
 export default function BettingSlip() {
   const router = useRouter();
@@ -23,10 +18,8 @@ export default function BettingSlip() {
     slips,
     poolId,
     hasEnteredPool,
-    hasPoolStarted,
     hasPoolEnded,
     hasWon,
-    setHasEnteredPool,
     updateSlipStatus,
     setSlipOutcome,
     resetSlip,
