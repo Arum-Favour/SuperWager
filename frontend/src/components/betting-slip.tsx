@@ -14,6 +14,7 @@ import Confetti from "react-confetti";
 import { toast } from "sonner";
 import Loader from "./loader";
 import SlipCard from "./slip-card";
+import EnterPoolModal from "./enter-pool-modal";
 
 export default function BettingSlip() {
   const router = useRouter();
@@ -32,6 +33,8 @@ export default function BettingSlip() {
   } = useBettingSlips();
 
   const [showEnterPoolModal, setShowEnterPoolModal] = useState(false);
+
+  const close = () => setShowEnterPoolModal(false);
 
   const [betslipLeagues, setBetslipLeagues] = useState<string[]>([]);
 
@@ -122,75 +125,7 @@ export default function BettingSlip() {
           </div>
         </div>
       )}
-      {showEnterPoolModal && (
-        <div className="fixed inset-0 items-center justify-center flex z-50">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setShowEnterPoolModal(false)}
-          />
-          <div className="bg-white rounded-[20px] p-10 relative flex flex-col items-center justify-center gap-10">
-            <span
-              className="p-2 rounded-full border-2 border-[var(--primary)] absolute top-2 right-2 cursor-pointer"
-              onClick={() => setShowEnterPoolModal(false)}
-            >
-              <CancelXIcon className="size-4 stroke-[var(--primary)]" />
-            </span>
-            <div className="flex w-full flex-col gap-6">
-              <div className="flex items-center gap-4 p-1 px-4 border border-red-400 rounded-full">
-                <TriangleAlert color="red" />
-                <p className="text-xl font-semibold">
-                  Once you select pool you cannot edit slip.
-                </p>
-              </div>
-              <div className="flex justify-between items-center gap-10">
-                <p className="text-3xl">Enter Pool</p>
-                <div className="rounded-[10px] gap-5 px-6 py-4 bg-[var(--primary-light)] flex items-center justify-center">
-                  <span className="cursor-pointer">
-                    <LessThan />
-                  </span>
-                  <p className="text-2xl">0.1 SST</p>
-                  <span className="cursor-pointer">
-                    <GreaterThan />
-                  </span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="text-3xl">Wallet balance</p>
-                <p className="text-2xl">5 STT</p>
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-4">
-              <p className="text-[var(--primary)] text-2xl flex gap-2 items-center cursor-pointer">
-                Fund Wallet
-                <span>
-                  <Plus className="stroke-[var(--primary)] stroke-2" />
-                </span>
-              </p>
-              <button
-                onClick={() => {
-                  setHasEnteredPool(true);
-                  toast.success("You have entered the pool");
-                  setShowEnterPoolModal(false);
-                  localStorage.setItem(
-                    "game",
-                    JSON.stringify({
-                      slips,
-                      poolId,
-                      hasEnteredPool,
-                      hasPoolStarted,
-                      hasPoolEnded,
-                      hasWon,
-                    })
-                  );
-                }}
-                className="text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-4 text-white capitalize hover:bg-[var(--primary)]/80"
-              >
-                Choose Pool
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {showEnterPoolModal && <EnterPoolModal close={close} />}
       {showConfetti && (
         <Confetti
           width={window.innerWidth}
@@ -210,16 +145,16 @@ export default function BettingSlip() {
           wind={0.01}
         />
       )}
-      <div className="bg-[var(--primary-light)] rounded-2xl py-6 px-8 flex flex-col gap-16">
-        <div className="w-full flex justify-between">
-          <div className="flex justify-between flex-col">
-            <h2 className="text-3xl flex gap-2">
+      <div className="bg-[var(--primary-light)] rounded-2xl py-3 md:py-6 px-4 md:px-8 flex flex-col gap-6 sm:gap-10 md:gap-16">
+        <div className="w-full flex max-[480px]:flex-col gap-y-4 justify-between">
+          <div className="flex justify-between gap-y-2 flex-col">
+            <h2 className="text-base sm:text-xl md:text-3xl flex flex-wrap gap-2">
               Betting Slip
-              <span className="bg-white py-0.5 px-2.5 text-2xl rounded-[6px] text-black/50">
+              <span className="bg-white py-0.5 px-1.5 md:px-2.5 text-sm sm:text-lg md:text-2xl rounded-[6px] text-black/50">
                 {poolId}
               </span>
             </h2>
-            <p className="flex gap-6">
+            <p className="flex flex-wrap gap-y-2 gap-x-4 md:gap-x-6 text-sm md:text-base">
               <span>Total Games: {slips.length}</span>
               <span>
                 Total Odds:{" "}
@@ -237,12 +172,14 @@ export default function BettingSlip() {
                   if (hasEnteredPool) router.push("/create-slip");
                   else setShowEnterPoolModal(true);
                 }}
-                className="text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-4 text-white capitalize hover:bg-[var(--primary)]/80"
+                className="w-fit text-sm md:text-lg bg-[var(--primary)] rounded-md sm:rounded-lg px-2 sm:px-3.5 py-2.5 sm:py-4 text-white capitalize hover:bg-[var(--primary)]/80"
               >
                 Enter Pool
               </button>
             )}
-            <p className="self-end">Pool: 0.1 SST</p>
+            <p className="min-[480px]:self-end text-xs md:text-base">
+              Pool: 0.1 SST
+            </p>
           </div>
         </div>
 

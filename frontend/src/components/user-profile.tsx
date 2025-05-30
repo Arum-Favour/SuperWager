@@ -271,14 +271,14 @@ export default function UserProfile() {
                               {isSending ? "Sending..." : "Send STT"}
                             </button>
 
-                            <button
+                            {/* <button
                               onClick={handleSignMessage}
                               disabled={isSending || isSigning}
                               className="flex items-center w-full px-4 py-2 text-sm text-white"
                             >
                               <PencilSquareIcon className="mr-2 h-4 w-4" />
                               {isSigning ? "Signing..." : "Sign Message"}
-                            </button>
+                            </button> */}
                           </>
                         )}
                       </div>

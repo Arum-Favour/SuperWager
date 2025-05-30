@@ -70,13 +70,17 @@ export default function SlipCard({
           : matchOutcome === "lost"
           ? "bg-[#F9070B1A]"
           : "bg-white/50"
-      } p-6 flex flex-col justify-between gap-8 rounded-4xl`}
+      } p-4 md:p-6 flex flex-col justify-between gap-6 md:gap-8 rounded-4xl`}
     >
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-6">
-          <Image src={soccer} alt="image of a soccerball" />
+      <div className="flex items-center flex-wrap justify-between gap-4">
+        <div className="flex items-center gap-3 md:gap-6">
+          <Image
+            src={soccer}
+            alt="image of a soccerball"
+            className="size-6 sm:size-8 md:size-12"
+          />
 
-          <p className="flex flex-col items-center justify-center w-20">
+          <p className="flex flex-col items-center justify-center text-xs sm:text-sm md:text-base">
             {(() => {
               const match = scoresData[idx];
 
@@ -128,30 +132,36 @@ export default function SlipCard({
             })()}
           </p>
         </div>
-        <div className="flex gap-16">
+        <div className="flex gap-8 md:gap-16">
           {hasEnteredPool ? (
             <span>
-              {matchOutcome === "won" && <GreenCheckIcon />}
-              {matchOutcome === "lost" && <RedXIcon />}
+              {matchOutcome === "won" && (
+                <GreenCheckIcon className="size-4 sm:size-6 md:size-7" />
+              )}
+              {matchOutcome === "lost" && (
+                <RedXIcon className="size-4 sm:size-6 md:size-7" />
+              )}
 
               {matchOutcome === "pending" &&
                 (!scoresData[idx] ||
                   new Date(scoresData[idx].sport_event.start_time) >
-                    new Date()) && <PendingIconBlack />}
+                    new Date()) && (
+                  <PendingIconBlack className="size-4 md:size-6" />
+                )}
               {matchOutcome === "pending" &&
                 !(
                   !scoresData[idx] ||
                   new Date(scoresData[idx].sport_event.start_time) > new Date()
-                ) && <PendingIconBlue />}
+                ) && <PendingIconBlue className="size-4 md:size-6" />}
             </span>
           ) : (
             <>
               <p
-                className="flex gap-2 text-2xl text-[var(--primary)] cursor-pointer"
+                className="flex gap-2 text-xs sm:text-sm md:text-2xl text-[var(--primary)] cursor-pointer"
                 onClick={() => router.push("/create-slip")}
                 title="edit game on slip"
               >
-                Edit <EditIcon />
+                Edit <EditIcon className="size-4 md:size-[30px]" />
               </p>
               <span
                 title="remove game from slip"
@@ -159,26 +169,30 @@ export default function SlipCard({
                   removeSlip(game);
                 }}
               >
-                <CancelXIcon className="cursor-pointer" />
+                <CancelXIcon className="cursor-pointer size-3 sm:size-4 md:size-[26px]" />
               </span>
             </>
           )}
         </div>
       </div>
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-col gap-8">
-          <div className="flex gap-16 justify-between w-64">
+      <div className="flex items-center flex-wrap justify-between gap-4">
+        <div className="flex flex-col gap-4 md:gap-8 text-xs sm:text-sm md:text-base">
+          <div className="flex gap-6 sm:gap-8 md:gap-16 justify-between md:w-64">
             <p>{game.homeTeam}</p>
-            <p>{scoresData[idx]?.sport_event_status.home_score ?? "-"}</p>
+            <p className="font-medium">
+              {scoresData[idx]?.sport_event_status.home_score ?? "-"}
+            </p>
           </div>
-          <div className="flex gap-16 justify-between w-64">
+          <div className="flex gap-6 sm:gap-8 md:gap-16 justify-between md:w-64">
             <p>{game.awayTeam}</p>
-            <p>{scoresData[idx]?.sport_event_status.away_score ?? "-"}</p>
+            <p className="font-medium">
+              {scoresData[idx]?.sport_event_status.away_score ?? "-"}
+            </p>
           </div>
         </div>
-        <div className="flex gap-16 mt-auto capitalize">
-          <p className="text-xl self-start">{game.selection}</p>
-          <p className="text-xl">{parseFloat(game.odds).toFixed(2)}</p>
+        <div className="flex gap-4 sm:gap-8 md:gap-16 mt-auto capitalize text-xs sm:text-sm md:text-xl">
+          <p>{game.selection}</p>
+          <p className="font-medium">{parseFloat(game.odds).toFixed(2)}</p>
         </div>
       </div>
     </div>
