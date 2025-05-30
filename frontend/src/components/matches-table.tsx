@@ -167,7 +167,6 @@ export default function MatchesTable() {
           <p className="text-sm">Today</p>
 
           <DatePicker
-            excludeDates={daysArray.map((item) => new Date(item.date))}
             minDate={new Date()}
             selected={new Date(startingDate)}
             onChange={(date) => setStartingDate(date?.toDateString() || "")}
@@ -312,7 +311,7 @@ export default function MatchesTable() {
                 </div>
               </div>
               <div className="flex items-center gap-4 md:gap-8">
-                <div className="text-xs xs:text-sm sm:text-base md:text-xl flex flex-col gap-2 items-center justify-center">
+                <div className="text-xs sm:text-base md:text-xl flex flex-col gap-2 items-center justify-center">
                   <span>
                     {match.sport_event_status.status === "not_started"
                       ? "-"
@@ -340,7 +339,7 @@ export default function MatchesTable() {
                         )
                           ? "bg-[var(--primary)] text-white"
                           : "bg-[var(--primary-light)]"
-                      } p-2.5 rounded-sm w-8 md:w-12 flex items-center justify-center`}
+                      } p-2.5 rounded-sm w-8 md:w-12 flex items-center text-xs md:text-base justify-center`}
                       onClick={() => {
                         if (match.sport_event_status.match_status === "ended") {
                           toast.error("Match ended, cannot add match to slip");
@@ -411,7 +410,7 @@ export default function MatchesTable() {
                         )
                           ? "bg-[var(--primary)] text-white"
                           : "bg-[var(--primary-light)]"
-                      } p-2.5 rounded-sm w-8 md:w-12 flex items-center justify-center`}
+                      } p-2.5 rounded-sm w-8 md:w-12 text-xs md:text-base flex items-center justify-center`}
                       onClick={() => {
                         if (match.sport_event_status.match_status === "ended") {
                           toast.error("Match ended, cannot add match to slip");
@@ -483,7 +482,7 @@ export default function MatchesTable() {
                         )
                           ? "bg-[var(--primary)] text-white"
                           : "bg-[var(--primary-light)]"
-                      } p-2.5 rounded-sm w-8 md:w-12 flex items-center justify-center`}
+                      } p-2.5 rounded-sm w-8 md:w-12 text-xs md:text-base flex items-center justify-center`}
                       onClick={() => {
                         if (match.sport_event_status.match_status === "ended") {
                           toast.error("Match ended, cannot add match to slip");
@@ -551,17 +550,8 @@ export default function MatchesTable() {
 }
 
 export function MiniMatchesTable() {
-  const {
-    isError,
-    isLoading,
-    league,
-    matches,
-    prev,
-    next,
-    odds,
-    startingDate,
-    setStartingDate,
-  } = useMatches();
+  const { isError, isLoading, matches, odds, startingDate, setStartingDate } =
+    useMatches();
 
   return (
     <Link href={"/create-slip"}>
@@ -731,7 +721,7 @@ export function MiniMatchesTable() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4 md:gap-8">
-                  <div className="text-xs xs:text-sm sm:text-base md:text-xl flex flex-col gap-2 items-center justify-center">
+                  <div className="text-xs sm:text-base md:text-xl flex flex-col gap-2 items-center justify-center">
                     <span>
                       {match.sport_event_status.status === "not_started"
                         ? "-"
@@ -747,7 +737,7 @@ export function MiniMatchesTable() {
                   <div className="flex items-center gap-2 xs:gap-4 [&>div>p:nth-child(2)]:cursor-pointer">
                     <div className="flex items-center flex-col gap-1 justify-center">
                       <p className="text-sm hidden lg:block">1</p>
-                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-8 md:w-12 flex items-center justify-center">
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-8 md:w-12 text-xs md:text-base flex items-center justify-center">
                         {match.sport_event_status.match_status !== "ended"
                           ? (() => {
                               const foundEvent = odds.find(
@@ -769,7 +759,7 @@ export function MiniMatchesTable() {
                     </div>
                     <div className="flex items-center flex-col gap-1 justify-center">
                       <p className="text-sm hidden lg:block">X</p>
-                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-8 md:w-12 flex items-center justify-center">
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-8 md:w-12 text-xs md:text-base flex items-center justify-center">
                         {match.sport_event_status.match_status !== "ended"
                           ? (() => {
                               const foundEvent = odds.find(
@@ -791,7 +781,7 @@ export function MiniMatchesTable() {
                     </div>
                     <div className="flex items-center flex-col gap-1 justify-center">
                       <p className="text-sm hidden lg:block">2</p>
-                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-8 md:w-12 flex items-center justify-center">
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-8 md:w-12 text-xs md:text-base flex items-center justify-center">
                         {match.sport_event_status.match_status !== "ended"
                           ? (() => {
                               const foundEvent = odds.find(

@@ -1,6 +1,7 @@
-export function PendingIconBlue() {
+export function PendingIconBlue(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
+      {...props}
       width="24"
       height="24"
       viewBox="0 0 24 24"
@@ -21,9 +22,10 @@ export function PendingIconBlue() {
   );
 }
 
-export function PendingIconBlack() {
+export function PendingIconBlack(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
+      {...props}
       width="24"
       height="24"
       viewBox="0 0 24 24"

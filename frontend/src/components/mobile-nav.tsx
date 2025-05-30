@@ -26,14 +26,18 @@ export default function MobileNav() {
         </div>
         <div className="flex flex-col cursor-pointer items-center gap-1">
           <PlayIcon
-            className={`size-6 fill-${
-              pathname === "/create-slip" ? "[var(--primary)]" : "white"
+            className={`size-6 ${
+              pathname === "/create-slip"
+                ? "fill-[var(--primary)]"
+                : "fill-white"
             }`}
           />
           <Link
             href="/create-slip"
-            className={`text-${
-              pathname === "/create-slip" ? "[var(--primary)]" : "white"
+            className={`${
+              pathname === "/create-slip"
+                ? "text-[var(--primary)]"
+                : "text-white"
             } text-xs sm:text-sm`}
           >
             Create Slip
@@ -41,16 +45,20 @@ export default function MobileNav() {
         </div>
         <div className="flex flex-col cursor-pointer items-center gap-1">
           <p
-            className={`text-${
-              pathname === "/betting-slips" ? "[var(--primary)]" : "white"
+            className={`${
+              pathname === "/betting-slips"
+                ? "text-[var(--primary)]"
+                : "text-white"
             } text-xl`}
           >
             {slips.length}
           </p>
           <Link
             href="/betting-slips"
-            className={`text-${
-              pathname === "/betting-slips" ? "[var(--primary)]" : "white"
+            className={`${
+              pathname === "/betting-slips"
+                ? "text-[var(--primary)]"
+                : "text-white"
             } text-xs sm:text-sm`}
           >
             Bet Slip
@@ -58,14 +66,18 @@ export default function MobileNav() {
         </div>
         <div className="flex flex-col cursor-pointer items-center gap-1">
           <History
-            className={`size-6 stroke-${
-              pathname === "/bet-history" ? "[var(--primary)]" : "white"
+            className={`size-6 ${
+              pathname === "/bet-history"
+                ? "stroke-[var(--primary)]"
+                : "stroke-white"
             }`}
           />
           <Link
             href="/bet-history"
-            className={`text-${
-              pathname === "/bet-history" ? "[var(--primary)]" : "white"
+            className={`${
+              pathname === "/bet-history"
+                ? "text-[var(--primary)]"
+                : "text-white"
             } text-xs sm:text-sm`}
           >
             Bet History
