@@ -1,8 +1,10 @@
 import CancelXIcon from "@/assets/svgs/cancel-x";
 import GreaterThan from "@/assets/svgs/double-greaterthan";
 import LessThan from "@/assets/svgs/double-lessthan";
+import { useAuthModal } from "@/context/AuthModalContext";
 import { useBettingSlips } from "@/context/useBettingSlips";
 import { Plus, TriangleAlert } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export default function EnterPoolModal({ close }: { close: () => void }) {
@@ -15,6 +17,16 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
     hasWon,
     setHasEnteredPool,
   } = useBettingSlips();
+
+  const { userData } = useAuthModal();
+
+  const [poolOption, setPoolOption] = useState("0.1");
+
+  const increase = () =>
+    setPoolOption((prev) => (parseFloat(prev) + 0.1).toFixed(1));
+
+  const decrease = () =>
+    setPoolOption((prev) => Math.max(0.1, parseFloat(prev) - 0.1).toFixed(1));
 
   return (
     <div className="fixed inset-0 items-center justify-center flex z-50">
@@ -38,11 +50,11 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
               Enter Pool
             </p>
             <div className="rounded-[10px] gap-3 md:gap-5 px-3 md:px-6 py-2 md:py-4 bg-[var(--primary-light)] flex items-center justify-center">
-              <span className="cursor-pointer">
+              <span className="cursor-pointer" onClick={decrease}>
                 <LessThan className="size-4 md:size-6" />
               </span>
-              <p className="text-sm sm:text-xl md:text-2xl">0.1 SST</p>
-              <span className="cursor-pointer">
+              <p className="text-sm sm:text-xl md:text-2xl">{poolOption} SST</p>
+              <span className="cursor-pointer" onClick={increase}>
                 <GreaterThan className="size-4 md:size-6" />
               </span>
             </div>
@@ -51,9 +63,25 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
             <p className="text-sm sm:text-xl md:text-2xl font-medium">
               Wallet balance
             </p>
-            <p className="text-sm sm:text-xl md:text-2xl">5 STT</p>
+            <p className="text-sm sm:text-xl md:text-2xl">
+              {userData.balance} STT
+            </p>
           </div>
         </div>
+
+        {(userData.balance < poolOption ||
+          hasEnteredPool ||
+          hasPoolStarted) && (
+          <p className="w-full text-center font-medium text-sm text-red-500">
+            {userData.balance < poolOption
+              ? "Insufficient balance to enter the pool. Please fund your wallet."
+              : hasEnteredPool
+              ? "You have already entered the pool."
+              : hasPoolStarted
+              ? " The pool has already started, you cannot enter now."
+              : ""}
+          </p>
+        )}
         <div className="flex items-center justify-center gap-4">
           <p className="text-[var(--primary)] text-sm sm:text-xl md:text-2xl font-medium flex gap-2 items-center cursor-pointer">
             Fund Wallet
@@ -62,6 +90,9 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
             </span>
           </p>
           <button
+            disabled={
+              userData.balance < poolOption || hasEnteredPool || hasPoolStarted
+            }
             onClick={() => {
               setHasEnteredPool(true);
               toast.success("You have entered the pool");

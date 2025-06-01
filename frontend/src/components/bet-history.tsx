@@ -1,6 +1,6 @@
 "use client";
 
-import soccer from "@/assets/images/soccer.png";
+import soccer from "@/assets/images/soccer.webp";
 import GreenCheckIcon from "@/assets/svgs/green-check";
 import { PendingIconBlack, PendingIconBlue } from "@/assets/svgs/pending";
 import RedXIcon from "@/assets/svgs/red-x";

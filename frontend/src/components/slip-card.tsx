@@ -1,4 +1,4 @@
-import soccer from "@/assets/images/soccer.png";
+import soccer from "@/assets/images/soccer.webp";
 import CancelXIcon from "@/assets/svgs/cancel-x";
 import EditIcon from "@/assets/svgs/edit-icon";
 import GreenCheckIcon from "@/assets/svgs/green-check";

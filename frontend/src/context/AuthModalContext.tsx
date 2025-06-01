@@ -1,22 +1,16 @@
 "use client";
 
+import { usePrivy } from "@privy-io/react-auth";
 import { createContext, useContext, useEffect, useState } from "react";
 
-type UserType = {
-  username: string;
-  email: string;
-  password: string;
-  wallet?: string;
-} | null;
-
 type ModalContextType = {
-  isOpen: boolean;
-  openModal: () => void;
-  closeModal: () => void;
-  isSignUp: boolean;
-  toggleMode: () => void;
-  user: UserType;
-  setUser: React.Dispatch<React.SetStateAction<UserType>>;
+  isLoginModalOpen: boolean;
+  openLoginModal: () => void;
+  closeLoginModal: () => void;
+  userData: UserType;
+  setUserData: React.Dispatch<React.SetStateAction<UserType>>;
+  handleLogin: () => Promise<void>;
+  handleLogout: () => void;
 };
 
 const AuthModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -26,30 +20,60 @@ export const AuthModalProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
+  const { login, user, logout } = usePrivy();
 
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
-  const toggleMode = () => setIsSignUp((prev) => !prev);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const openLoginModal = () => setIsLoginModalOpen(true);
+  const closeLoginModal = () => setIsLoginModalOpen(false);
 
-  const [user, setUser] = useState<UserType | null>(null);
+  const [userData, setUserData] = useState<UserType>({
+    user_id: "",
+    username: "User",
+    email: "",
+    embeddedWallet: null,
+    balance: "0.00",
+    walletAddress: "",
+  });
+
+  const handleLogin = async () => {
+    try {
+      await login();
+      closeLoginModal();
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
+  };
+
+  const handleLogout = () => logout();
+
+  const getDisplayName = () => {
+    if (!user) return "User";
+
+    if (user.email?.address) return user.email.address.split("@")[0];
+
+    return user.id?.substring(0, 8) || "User";
+  };
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) setUser(JSON.parse(storedUser));
-  }, []);
+    if (user)
+      setUserData({
+        ...userData,
+        user_id: user.id,
+        username: getDisplayName(),
+        email: user.email?.address || "",
+      });
+  }, [user]);
 
   return (
     <AuthModalContext.Provider
       value={{
-        isOpen,
-        isSignUp,
-        openModal,
-        closeModal,
-        toggleMode,
-        user,
-        setUser,
+        isLoginModalOpen,
+        openLoginModal,
+        closeLoginModal,
+        userData,
+        setUserData,
+        handleLogin,
+        handleLogout,
       }}
     >
       {children}

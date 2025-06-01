@@ -1,3 +1,12 @@
+type UserType = {
+  user_id: string;
+  username: string;
+  email: string;
+  embeddedWallet: ConnectedWallet | null;
+  balance: string;
+  walletAddress: string;
+};
+
 type MatchOutcome = "pending" | "won" | "lost";
 type MatchSelection = "home" | "away" | "draw";
 

@@ -14,17 +14,19 @@ export default function MobileNav() {
   return (
     <nav className="fixed lg:hidden bottom-0 inset-x-0 bg-black px-[5%] py-4">
       <div className="flex items-end justify-between gap-4">
-        <div className="flex flex-col cursor-pointer items-center">
-          <Link
-            href="/"
+        <Link href="/" className="flex flex-col cursor-pointer items-center">
+          <h2
             className={`text-white text-2xl font-bold pb-1 w-[50px] text-center inknut-antiqua ${
               pathname === "/" ? "border-b-[3px] border-b-[var(--primary)]" : ""
             }`}
           >
             S
-          </Link>
-        </div>
-        <div className="flex flex-col cursor-pointer items-center gap-1">
+          </h2>
+        </Link>
+        <Link
+          href="/create-slip"
+          className="flex flex-col cursor-pointer items-center gap-1"
+        >
           <PlayIcon
             className={`size-6 ${
               pathname === "/create-slip"
@@ -32,8 +34,7 @@ export default function MobileNav() {
                 : "fill-white"
             }`}
           />
-          <Link
-            href="/create-slip"
+          <p
             className={`${
               pathname === "/create-slip"
                 ? "text-[var(--primary)]"
@@ -41,9 +42,12 @@ export default function MobileNav() {
             } text-xs sm:text-sm`}
           >
             Create Slip
-          </Link>
-        </div>
-        <div className="flex flex-col cursor-pointer items-center gap-1">
+          </p>
+        </Link>
+        <Link
+          href="/betting-slips"
+          className="flex flex-col cursor-pointer items-center gap-1"
+        >
           <p
             className={`${
               pathname === "/betting-slips"
@@ -53,8 +57,7 @@ export default function MobileNav() {
           >
             {slips.length}
           </p>
-          <Link
-            href="/betting-slips"
+          <p
             className={`${
               pathname === "/betting-slips"
                 ? "text-[var(--primary)]"
@@ -62,9 +65,12 @@ export default function MobileNav() {
             } text-xs sm:text-sm`}
           >
             Bet Slip
-          </Link>
-        </div>
-        <div className="flex flex-col cursor-pointer items-center gap-1">
+          </p>
+        </Link>
+        <Link
+          href="/bet-history"
+          className="flex flex-col cursor-pointer items-center gap-1"
+        >
           <History
             className={`size-6 ${
               pathname === "/bet-history"
@@ -72,8 +78,7 @@ export default function MobileNav() {
                 : "stroke-white"
             }`}
           />
-          <Link
-            href="/bet-history"
+          <p
             className={`${
               pathname === "/bet-history"
                 ? "text-[var(--primary)]"
@@ -81,8 +86,8 @@ export default function MobileNav() {
             } text-xs sm:text-sm`}
           >
             Bet History
-          </Link>
-        </div>
+          </p>
+        </Link>
       </div>
     </nav>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthModal } from "@/context/AuthModalContext";
 import {
   Dialog,
   DialogPanel,
@@ -7,29 +8,14 @@ import {
   Transition,
   TransitionChild,
 } from "@headlessui/react";
-import { usePrivy } from "@privy-io/react-auth";
 import { Fragment } from "react";
 
-type LoginModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-};
-
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
-  const { login } = usePrivy();
-
-  const handleLogin = async () => {
-    try {
-      await login();
-      onClose();
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
-  };
+export default function LoginModal() {
+  const { handleLogin, isLoginModalOpen, closeLoginModal } = useAuthModal();
 
   return (
-    <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={onClose}>
+    <Transition appear show={isLoginModalOpen} as={Fragment}>
+      <Dialog as="div" className="relative z-50" onClose={closeLoginModal}>
         <TransitionChild
           as={Fragment}
           enter="ease-out duration-300"
