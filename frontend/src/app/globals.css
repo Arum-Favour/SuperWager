@@ -21,8 +21,9 @@ body {
 }
 
 button {
-  @apply cursor-pointer;
+  @apply cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
 }
+
 input {
   @apply border-[var(--primary)] border-3;
 }

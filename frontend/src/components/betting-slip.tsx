@@ -10,6 +10,7 @@ import Confetti from "react-confetti";
 import EnterPoolModal from "./enter-pool-modal";
 import Loader from "./loader";
 import SlipCard from "./slip-card";
+import { useAuthModal } from "@/context/AuthModalContext";
 
 export default function BettingSlip() {
   const router = useRouter();
@@ -24,6 +25,8 @@ export default function BettingSlip() {
     setSlipOutcome,
     resetSlip,
   } = useBettingSlips();
+
+  const { userData } = useAuthModal();
 
   const [showEnterPoolModal, setShowEnterPoolModal] = useState(false);
 
@@ -161,6 +164,7 @@ export default function BettingSlip() {
           <div className="flex flex-col gap-2">
             {!hasEnteredPool && (
               <button
+                disabled={isLoading}
                 onClick={() => {
                   if (hasEnteredPool) router.push("/create-slip");
                   else setShowEnterPoolModal(true);

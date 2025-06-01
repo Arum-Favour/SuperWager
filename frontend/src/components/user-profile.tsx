@@ -1,11 +1,10 @@
 "use client";
 
+import { useAuthModal } from "@/context/AuthModalContext";
 import { Menu, MenuButton, MenuItems, Transition } from "@headlessui/react";
 import {
   ArrowDownTrayIcon,
   ClipboardDocumentIcon,
-  DocumentTextIcon,
-  PencilSquareIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
@@ -16,22 +15,31 @@ import {
   UserCircleIcon,
   WalletIcon,
 } from "lucide-react";
-import Link from "next/link";
 import React, { Fragment, useEffect, useState } from "react";
 import LoginModal from "./auth-modal";
 
 export default function UserProfile() {
-  const { authenticated, user, logout, ready, login, sendTransaction } =
-    usePrivy();
+  const { authenticated, ready, sendTransaction } = usePrivy();
   const { wallets } = useWallets();
 
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const {
+    openLoginModal,
+    userData: {
+      balance,
+      walletAddress,
+      embeddedWallet,
+      username,
+      user_id,
+      email,
+    },
+    setUserData,
+    handleLogin,
+    handleLogout,
+  } = useAuthModal();
+
   const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
-  const [balance, setBalance] = useState("0.00");
   const [isSending, setIsSending] = useState(false);
   const [isSigning, setIsSigning] = useState(false);
-  const [embeddedWallet, setEmbeddedWallet] = useState<any>(null);
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [recipientAddress, setRecipientAddress] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("0.001");
@@ -48,14 +56,19 @@ export default function UserProfile() {
         );
 
         if (embedded) {
-          setEmbeddedWallet(embedded);
-          setWalletAddress(embedded.address);
-
           try {
             const provider = await embedded.getEthereumProvider();
             const ethersProvider = new ethers.providers.Web3Provider(provider);
             const balance = await ethersProvider.getBalance(embedded.address);
-            setBalance(ethers.utils.formatEther(balance).substring(0, 6));
+
+            setUserData({
+              username,
+              user_id,
+              email,
+              embeddedWallet: embedded,
+              walletAddress: embedded.address,
+              balance: ethers.utils.formatEther(balance).substring(0, 6),
+            });
           } catch (error) {
             console.error("Error fetching balance:", error);
           }
@@ -69,15 +82,7 @@ export default function UserProfile() {
   const handleFund = async () => {
     setIsWalletMenuOpen(false);
 
-    if (!embeddedWallet) {
-      try {
-        await login();
-        return;
-      } catch (error) {
-        console.error("Error during login/wallet creation:", error);
-        return;
-      }
-    }
+    if (!embeddedWallet) handleLogin();
 
     setIsFundModalOpen(true);
   };
@@ -101,8 +106,8 @@ export default function UserProfile() {
     setTxHash(null);
   };
 
-  const handleWithdraw = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleWithdraw = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     if (!embeddedWallet) return;
     if (!recipientAddress || !withdrawAmount) {
@@ -155,29 +160,21 @@ export default function UserProfile() {
     }
   };
 
-  const handleSignMessage = async () => {
-    if (!embeddedWallet) return;
+  // const handleSignMessage = async () => {
+  //   if (!embeddedWallet) return;
 
-    setIsSigning(true);
-    try {
-      const message = "Hello from SuperWager!";
-      const signature = await embeddedWallet.signMessage(message);
-      console.log("Message signed:", signature);
-    } catch (error) {
-      console.error("Error signing message:", error);
-    } finally {
-      setIsSigning(false);
-      setIsWalletMenuOpen(false);
-    }
-  };
-
-  const getDisplayName = () => {
-    if (!user) return "User";
-
-    if (user.email?.address) return user.email.address.split("@")[0];
-
-    return user.id?.substring(0, 8) || "User";
-  };
+  //   setIsSigning(true);
+  //   try {
+  //     const message = "Hello from SuperWager!";
+  //     const signature = await embeddedWallet.signMessage(message);
+  //     console.log("Message signed:", signature);
+  //   } catch (error) {
+  //     console.error("Error signing message:", error);
+  //   } finally {
+  //     setIsSigning(false);
+  //     setIsWalletMenuOpen(false);
+  //   }
+  // };
 
   if (!ready) return null;
 
@@ -185,16 +182,13 @@ export default function UserProfile() {
     return (
       <>
         <button
-          onClick={() => setIsLoginModalOpen(true)}
+          onClick={openLoginModal}
           className="bg-white border-[var(--primary)] border-[2px] rounded-[4px] text-[var(--primary)] py-1 px-2.5 sm:py-2.5 sm:px-4 font-medium text-base transition-all cursor-pointer hover:bg-white/80"
         >
           Log in
         </button>
 
-        <LoginModal
-          isOpen={isLoginModalOpen}
-          onClose={() => setIsLoginModalOpen(false)}
-        />
+        <LoginModal />
       </>
     );
   }
@@ -204,7 +198,7 @@ export default function UserProfile() {
       <Menu as="div" className="relative z-[999]">
         <MenuButton className="flex items-center gap-2 text-sm font-medium border border-[var(--primary)] p-1 rounded-sm md:border-none">
           <UserCircleIcon className="size-6 md:size-8" />
-          <span className="hidden md:block">{getDisplayName()}</span>
+          <span className="hidden md:block">{username}</span>
           <ChevronDownIcon className="hidden md:flex size-6" />
           <span className="flex md:hidden text-[var(--primary)]">
             {balance} SST
@@ -222,12 +216,8 @@ export default function UserProfile() {
         >
           <MenuItems className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-[var(--primary)] shadow-lg ring-1 ring-[var(--primary)] ring-opacity-5 focus:outline-none divide-y divide-white">
             <div className="px-4 py-3">
-              <p className="text-sm font-medium text-white">
-                {getDisplayName()}
-              </p>
-              <p className="text-xs text-gray-300">
-                {user?.email?.address || ""}
-              </p>
+              <p className="text-sm font-medium text-white">{username}</p>
+              <p className="text-xs text-gray-300">{email}</p>
             </div>
 
             <div className="px-4 py-3">
@@ -302,7 +292,7 @@ export default function UserProfile() {
             </div>
 
             <ul className="py-1">
-              <li>
+              {/* <li>
                 <Link
                   href="/profile"
                   className={`text-white flex items-center px-4 py-2 text-sm`}
@@ -319,10 +309,10 @@ export default function UserProfile() {
                   <DocumentTextIcon className="mr-2 size-5" />
                   Bet History
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <button
-                  onClick={() => logout()}
+                  onClick={handleLogout}
                   className={`text-red-700 flex items-center w-full text-left px-4 py-2 text-sm`}
                 >
                   <ArrowDownTrayIcon className="mr-2 size-5 -rotate-90" />

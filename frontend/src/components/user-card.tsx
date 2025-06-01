@@ -1,6 +1,6 @@
 "use client";
 
-import pfp from "@/assets/images/default.png";
+import pfp from "@/assets/images/default.webp";
 import EditIcon from "@/assets/svgs/edit-icon";
 import HistoryIcon from "@/assets/svgs/history-icon";
 import PlayIcon from "@/assets/svgs/play-button";
@@ -16,9 +16,9 @@ export default function UserCard() {
   const [showWallet, setShowWallet] = useState(false);
   const [showBalance, setShowBalance] = useState(false);
 
-  const { user } = useAuthModal();
+  const { userData } = useAuthModal();
 
-  if (!user) return null;
+  if (!userData.user_id) return null;
 
   return (
     <>
@@ -69,7 +69,7 @@ export default function UserCard() {
           <div className="size-[100px] flex items-center justify-center bg-white rounded-full overflow-hidden">
             <Image src={pfp} alt="Profile Image" />
           </div>
-          <p className="">{user.username}</p>
+          <p className="">{userData.username}</p>
           <div className="w-full flex items-center justify-between">
             <p>0.1 SST Pool</p>
             <p>Point: -</p>
