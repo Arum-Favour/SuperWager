@@ -3,11 +3,25 @@ import GreaterThan from "@/assets/svgs/double-greaterthan";
 import LessThan from "@/assets/svgs/double-lessthan";
 import { useAuthModal } from "@/context/AuthModalContext";
 import { useBettingSlips } from "@/context/useBettingSlips";
-import { Plus, TriangleAlert } from "lucide-react";
-import { useState } from "react";
+import { usePoolContract } from "@/hooks/usePoolContracts";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { ethers } from "ethers";
+import { Loader, Loader2, Plus, TriangleAlert } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function EnterPoolModal({ close }: { close: () => void }) {
+  const { authenticated, login } = usePrivy();
+  const { wallets } = useWallets();
+  const {
+    getPoolBalance,
+    enterPool,
+    hasUserEnteredPool,
+    getPlayerCount,
+    debugContractState,
+    loading: contractLoading,
+  } = usePoolContract();
+
   const {
     slips,
     poolId,
@@ -28,10 +42,106 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
   const decrease = () =>
     setPoolOption((prev) => Math.max(0.1, parseFloat(prev) - 0.1).toFixed(1));
 
+  const [loading, setLoading] = useState(false);
+  const [poolBalance, setPoolBalance] = useState<string>("0.1");
+  const [playerCount, setPlayerCount] = useState<number>(0);
+  const [alreadyEntered, setAlreadyEntered] = useState(false);
+  const [walletBalance, setWalletBalance] = useState<string>("0");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (contractLoading) return;
+
+    (async () => {
+      if (authenticated && wallets.length) {
+        try {
+          const currentBalance = await getPoolBalance();
+          setPoolBalance(currentBalance);
+
+          const count = await getPlayerCount();
+          setPlayerCount(count);
+
+          const entered = await hasUserEnteredPool();
+          setAlreadyEntered(entered);
+
+          const embedded = wallets.find(
+            (wallet) => wallet.walletClientType === "privy"
+          );
+          if (embedded) {
+            const provider = await embedded.getEthereumProvider();
+            const ethersProvider = new ethers.providers.Web3Provider(provider);
+            const balance = await ethersProvider.getBalance(embedded.address);
+            const formattedBalance = ethers.utils.formatEther(balance);
+            setWalletBalance(formattedBalance);
+          }
+        } catch (error) {
+          console.error("Error fetching pool data:", error);
+          setError(error instanceof Error ? error.message : "Unknown error");
+        }
+      }
+    })();
+  }, [authenticated, wallets, contractLoading]);
+
+  const handleEnterPool = async () => {
+    if (slips.length === 0) {
+      toast.error("Please add slips to enter the pool.");
+      return;
+    }
+    if (!authenticated) {
+      toast.error("Please connect your wallet to enter the pool.");
+      login();
+      return;
+    }
+    if (walletBalance < poolOption) {
+      toast.error("Insufficient balance to enter the pool.");
+      return;
+    }
+    if (hasEnteredPool) {
+      toast.error("You have already entered the pool.");
+      return;
+    }
+    if (hasPoolStarted) {
+      toast.error("The pool has already started, you cannot enter now.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await debugContractState();
+
+      await enterPool(poolOption);
+
+      setHasEnteredPool(true);
+      toast.success("You have entered the pool");
+      close();
+      localStorage.setItem(
+        "game",
+        JSON.stringify({
+          slips,
+          poolId,
+          hasEnteredPool: true,
+          hasPoolStarted,
+          hasPoolEnded,
+          hasWon,
+        })
+      );
+    } catch (error) {
+      console.error("Failed to enter pool:", error);
+
+      const errorMessage =
+        error instanceof Error ? error.message : "something went wrong";
+      toast.error(errorMessage);
+      setError(errorMessage);
+    }
+
+    setLoading(false);
+  };
+
   return (
     <div className="fixed inset-0 items-center justify-center flex z-50">
       <div className="absolute inset-0 bg-black/50" onClick={close} />
-      <div className="bg-white rounded-xl md:rounded-[20px] px-4 sm:px-6 md:px-10 py-10 relative flex flex-col items-center justify-center gap-6 md:gap-10">
+      <div className="bg-white rounded-xl md:rounded-[20px] px-4 sm:px-6 md:px-10 py-10 relative flex flex-col items-center justify-center gap-6 md:gap-10 max-w-3xl">
         <span
           className="p-1 md:p-2 rounded-full border-2 border-[var(--primary)] absolute top-2 right-2 cursor-pointer"
           onClick={close}
@@ -64,17 +174,38 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
               Wallet balance
             </p>
             <p className="text-sm sm:text-xl md:text-2xl">
-              {userData.balance} STT
+              {walletBalance || 0.0} STT
             </p>
+          </div>
+          <div className="flex justify-between items-center gap-4">
+            <p className="text-sm sm:text-xl md:text-2xl font-medium">
+              Current pool balance
+            </p>
+            <p className="text-sm sm:text-xl md:text-2xl">
+              {parseFloat(poolBalance).toFixed(2)} STT
+            </p>
+          </div>
+
+          <div className="flex justify-between items-center gap-4">
+            <p className="text-sm sm:text-xl md:text-2xl font-medium">
+              Players in pool
+            </p>
+            <p className="text-sm sm:text-xl md:text-2xl">{playerCount}</p>
           </div>
         </div>
 
-        {(userData.balance < poolOption ||
+        {(error ||
+          walletBalance < poolOption ||
+          alreadyEntered ||
           hasEnteredPool ||
           hasPoolStarted) && (
           <p className="w-full text-center font-medium text-sm text-red-500">
-            {userData.balance < poolOption
-              ? "Insufficient balance to enter the pool. Please fund your wallet."
+            {error
+              ? error
+              : walletBalance < poolOption
+              ? "You do not have enough balance to enter the pool."
+              : alreadyEntered
+              ? "You have already entered the pool."
               : hasEnteredPool
               ? "You have already entered the pool."
               : hasPoolStarted
@@ -91,27 +222,26 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
           </p>
           <button
             disabled={
-              userData.balance < poolOption || hasEnteredPool || hasPoolStarted
+              loading ||
+              contractLoading ||
+              walletBalance < poolOption ||
+              hasEnteredPool ||
+              alreadyEntered ||
+              hasPoolStarted ||
+              loading
             }
-            onClick={() => {
-              setHasEnteredPool(true);
-              toast.success("You have entered the pool");
-              close();
-              localStorage.setItem(
-                "game",
-                JSON.stringify({
-                  slips,
-                  poolId,
-                  hasEnteredPool,
-                  hasPoolStarted,
-                  hasPoolEnded,
-                  hasWon,
-                })
-              );
-            }}
-            className="text-sm md:text-lg font-normal bg-[var(--primary)] rounded-lg px-2 md:px-3.5 py-2.5 md:py-4 text-white capitalize hover:bg-[var(--primary)]/80"
+            onClick={handleEnterPool}
+            className="flex items-center justify-center text-sm md:text-lg font-normal bg-[var(--primary)] rounded-lg px-2 md:px-3.5 py-2.5 md:py-4 text-white capitalize hover:bg-[var(--primary)]/80"
           >
-            Choose Pool
+            {loading || contractLoading ? (
+              <Loader2 className="size-6 animate-spin" />
+            ) : hasEnteredPool || alreadyEntered ? (
+              "Already Entered"
+            ) : hasPoolStarted ? (
+              "Pool Started"
+            ) : (
+              "Enter Pool"
+            )}
           </button>
         </div>
       </div>
