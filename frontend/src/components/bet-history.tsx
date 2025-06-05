@@ -4,6 +4,7 @@ import soccer from "@/assets/images/soccer.webp";
 import GreenCheckIcon from "@/assets/svgs/green-check";
 import { PendingIconBlack, PendingIconBlue } from "@/assets/svgs/pending";
 import RedXIcon from "@/assets/svgs/red-x";
+import { useAuthModal } from "@/context/AuthModalContext";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -12,10 +13,21 @@ export default function BetHistory() {
   const [activeSlip, setActiveSlip] = useState<number | null>(null);
   const [history, setHistory] = useState<GameState[]>([]);
 
+  const { userData } = useAuthModal();
+
   useEffect(() => {
     if (typeof window === undefined) return;
     setHistory(JSON.parse(localStorage.getItem("history") || "[]"));
   }, [window]);
+
+  if (!userData.user_id)
+    return (
+      <div className="my-8">
+        <p className="text-center text-2xl font-medium">
+          Please Log in to view your betting history.
+        </p>
+      </div>
+    );
 
   return (
     <div className="space-y-6">

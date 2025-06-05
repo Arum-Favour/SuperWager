@@ -28,7 +28,7 @@ export const AuthModalProvider = ({
 
   const [userData, setUserData] = useState<UserType>({
     user_id: "",
-    username: "User",
+    username: "",
     email: "",
     embeddedWallet: null,
     balance: "0.00",
@@ -44,7 +44,18 @@ export const AuthModalProvider = ({
     }
   };
 
-  const handleLogout = () => logout();
+  const handleLogout = () => {
+    logout();
+
+    setUserData({
+      user_id: "",
+      username: "",
+      email: "",
+      embeddedWallet: null,
+      balance: "0.00",
+      walletAddress: "",
+    });
+  };
 
   const getDisplayName = () => {
     if (!user) return "User";

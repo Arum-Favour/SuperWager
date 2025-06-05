@@ -5,8 +5,7 @@ import { useAuthModal } from "@/context/AuthModalContext";
 import { useBettingSlips } from "@/context/useBettingSlips";
 import { usePoolContract } from "@/hooks/usePoolContracts";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { ethers } from "ethers";
-import { Loader, Loader2, Plus, TriangleAlert } from "lucide-react";
+import { Loader2, Plus, TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -32,7 +31,9 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
     setHasEnteredPool,
   } = useBettingSlips();
 
-  const { userData } = useAuthModal();
+  const {
+    userData: { balance = "0.00" },
+  } = useAuthModal();
 
   const [poolOption, setPoolOption] = useState("0.1");
 
@@ -46,7 +47,6 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
   const [poolBalance, setPoolBalance] = useState<string>("0.1");
   const [playerCount, setPlayerCount] = useState<number>(0);
   const [alreadyEntered, setAlreadyEntered] = useState(false);
-  const [walletBalance, setWalletBalance] = useState<string>("0");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -63,17 +63,6 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
 
           const entered = await hasUserEnteredPool();
           setAlreadyEntered(entered);
-
-          const embedded = wallets.find(
-            (wallet) => wallet.walletClientType === "privy"
-          );
-          if (embedded) {
-            const provider = await embedded.getEthereumProvider();
-            const ethersProvider = new ethers.providers.Web3Provider(provider);
-            const balance = await ethersProvider.getBalance(embedded.address);
-            const formattedBalance = ethers.utils.formatEther(balance);
-            setWalletBalance(formattedBalance);
-          }
         } catch (error) {
           console.error("Error fetching pool data:", error);
           setError(error instanceof Error ? error.message : "Unknown error");
@@ -92,7 +81,7 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
       login();
       return;
     }
-    if (walletBalance < poolOption) {
+    if (balance < poolOption) {
       toast.error("Insufficient balance to enter the pool.");
       return;
     }
@@ -174,7 +163,7 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
               Wallet balance
             </p>
             <p className="text-sm sm:text-xl md:text-2xl">
-              {walletBalance || 0.0} STT
+              {balance || 0.0} STT
             </p>
           </div>
           <div className="flex justify-between items-center gap-4">
@@ -195,14 +184,14 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
         </div>
 
         {(error ||
-          walletBalance < poolOption ||
+          balance < poolOption ||
           alreadyEntered ||
           hasEnteredPool ||
           hasPoolStarted) && (
           <p className="w-full text-center font-medium text-sm text-red-500">
             {error
               ? error
-              : walletBalance < poolOption
+              : balance < poolOption
               ? "You do not have enough balance to enter the pool."
               : alreadyEntered
               ? "You have already entered the pool."
@@ -224,7 +213,7 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
             disabled={
               loading ||
               contractLoading ||
-              walletBalance < poolOption ||
+              balance < poolOption ||
               hasEnteredPool ||
               alreadyEntered ||
               hasPoolStarted ||

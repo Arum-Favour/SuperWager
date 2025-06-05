@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
-import { ethers } from "ethers";
-import { usePrivy, useWallets } from "@privy-io/react-auth";
 import PoolContractABI from "@/assets/data/PoolContract.json";
 import { getContractAddress } from "@/utils/privy/addresses";
 import { somniaChain } from "@/utils/privy/chain";
+import { usePrivy, useSendTransaction, useWallets } from "@privy-io/react-auth";
+import { ethers } from "ethers";
+import { useEffect, useState } from "react";
 
 export function usePoolContract() {
-  const { authenticated, sendTransaction } = usePrivy();
+  const { authenticated } = usePrivy();
+  const { sendTransaction } = useSendTransaction();
   const { wallets } = useWallets();
   const [contract, setContract] = useState<ethers.Contract | null>(null);
   const [embeddedWallet, setEmbeddedWallet] = useState<any>(null);

@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthModal } from "@/context/AuthModalContext";
 import { useBettingSlips } from "@/context/useBettingSlips";
 import { fetchMatches } from "@/utils/queries";
 import { useQuery } from "@tanstack/react-query";
@@ -10,7 +11,6 @@ import Confetti from "react-confetti";
 import EnterPoolModal from "./enter-pool-modal";
 import Loader from "./loader";
 import SlipCard from "./slip-card";
-import { useAuthModal } from "@/context/AuthModalContext";
 
 export default function BettingSlip() {
   const router = useRouter();
@@ -92,6 +92,15 @@ export default function BettingSlip() {
 
     setShowConfetti(hasPoolEnded && hasWon === "won");
   }, [hasPoolEnded, hasWon]);
+
+  if (!userData.user_id)
+    return (
+      <div className="my-8">
+        <p className="text-center text-2xl font-medium">
+          Please Log in to view your betting slip.
+        </p>
+      </div>
+    );
 
   if (!slips.length)
     return (
