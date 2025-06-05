@@ -7,7 +7,7 @@ import {
   ClipboardDocumentIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { usePrivy, useSendTransaction, useWallets } from "@privy-io/react-auth";
 import { ethers } from "ethers";
 import {
   ChevronDownIcon,
@@ -19,7 +19,8 @@ import React, { Fragment, useEffect, useState } from "react";
 import LoginModal from "./auth-modal";
 
 export default function UserProfile() {
-  const { authenticated, ready, sendTransaction } = usePrivy();
+  const { authenticated, ready } = usePrivy();
+  const { sendTransaction } = useSendTransaction();
   const { wallets } = useWallets();
 
   const {
@@ -251,25 +252,14 @@ export default function UserProfile() {
                         </button>
 
                         {embeddedWallet && (
-                          <>
-                            <button
-                              onClick={openWithdrawModal}
-                              disabled={isSending || isSigning}
-                              className="flex items-center w-full px-4 py-2 text-sm text-white"
-                            >
-                              <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
-                              {isSending ? "Sending..." : "Send STT"}
-                            </button>
-
-                            {/* <button
-                              onClick={handleSignMessage}
-                              disabled={isSending || isSigning}
-                              className="flex items-center w-full px-4 py-2 text-sm text-white"
-                            >
-                              <PencilSquareIcon className="mr-2 h-4 w-4" />
-                              {isSigning ? "Signing..." : "Sign Message"}
-                            </button> */}
-                          </>
+                          <button
+                            onClick={openWithdrawModal}
+                            disabled={isSending || isSigning}
+                            className="flex items-center w-full px-4 py-2 text-sm text-white"
+                          >
+                            <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
+                            {isSending ? "Sending..." : "Send STT"}
+                          </button>
                         )}
                       </div>
                     )}
