@@ -12,9 +12,12 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from "sonner";
 import Loader from "./loader";
+import { useAuthModal } from "@/context/AuthModalContext";
 
 export default function MatchesTable() {
   const router = useRouter();
+
+  const { userData } = useAuthModal();
 
   const {
     isError,
@@ -79,6 +82,10 @@ export default function MatchesTable() {
   };
 
   const createSlip = () => {
+    if (!userData.user_id) {
+      toast.error("Login to create bet slip");
+      return;
+    }
     if (!slips.length) {
       toast.error("No matches in slip");
       return;
