@@ -35,16 +35,16 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
     userData: { balance = "0.00" },
   } = useAuthModal();
 
-  const [poolOption, setPoolOption] = useState("0.1");
+  const [poolOption, setPoolOption] = useState("0.02");
 
   const increase = () =>
-    setPoolOption((prev) => (parseFloat(prev) + 0.1).toFixed(1));
+    setPoolOption((prev) => (parseFloat(prev) + 0.01).toFixed(2));
 
   const decrease = () =>
-    setPoolOption((prev) => Math.max(0.1, parseFloat(prev) - 0.1).toFixed(1));
+    setPoolOption((prev) => Math.max(0.02, parseFloat(prev) - 0.01).toFixed(2));
 
   const [loading, setLoading] = useState(false);
-  const [poolBalance, setPoolBalance] = useState<string>("0.1");
+  const [poolBalance, setPoolBalance] = useState<string>("0");
   const [playerCount, setPlayerCount] = useState<number>(0);
   const [alreadyEntered, setAlreadyEntered] = useState(false);
   const [error, setError] = useState<string | null>(null);
