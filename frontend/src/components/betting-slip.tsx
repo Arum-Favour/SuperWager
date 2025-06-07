@@ -11,6 +11,18 @@ import Confetti from "react-confetti";
 import EnterPoolModal from "./enter-pool-modal";
 import Loader from "./loader";
 import SlipCard from "./slip-card";
+import TrophyIcon from "@/assets/svgs/trophy";
+
+const calcScore = (slips: BettingSlip[]) => {
+  const totalOdds = slips.reduce((acc, slip) => acc + parseFloat(slip.odds), 0);
+
+  const oddsWon = slips.reduce(
+    (acc, slip) => acc + (slip.outcome === "won" ? parseFloat(slip.odds) : 0),
+    0
+  );
+
+  return oddsWon / totalOdds + oddsWon;
+};
 
 export default function BettingSlip() {
   const router = useRouter();
@@ -115,15 +127,20 @@ export default function BettingSlip() {
   return (
     <>
       {hasWon !== "pending" && (
-        <div className="fixed inset-0 items-center justify-center flex z-50">
+        <div className="fixed inset-0 items-center justify-center flex z-50 p-4">
           <div className="absolute inset-0 bg-black/50" />
-          <div className="bg-white rounded-[20px] p-10 relative flex flex-col items-center justify-center gap-10">
-            <p className="text-xl font-semibold">
-              You {hasWon === "lost" ? "Lose" : "Won"}
-            </p>
+          <div className="bg-white rounded-4xl p-8 md:p-16 relative flex flex-col items-center justify-center gap-6 md:gap-10 max-w-lg w-full">
+            <h4 className="text-xl font-sembold">Congratulations</h4>
+            <div>
+              <TrophyIcon />
+            </div>
+            <div className="flex items-center justify-center gap-2 flex-col">
+              <p>You finished 12th in the pool</p>
+              <p>Total points obtained: {calcScore(slips).toFixed(2)}</p>
+            </div>
             <button
               onClick={resetSlip}
-              className="text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-4 text-white capitalize hover:bg-[var(--primary)]/80"
+              className="w-full md:text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-4 text-white capitalize hover:bg-[var(--primary)]/80"
             >
               Next
             </button>
