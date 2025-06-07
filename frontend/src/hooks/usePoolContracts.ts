@@ -85,17 +85,17 @@ export function usePoolContract() {
 
     try {
       // Get MIN_DEPOSIT value
-      let value;
-      try {
-        value = await contract.MIN_DEPOSIT();
-        console.log(
-          "Using MIN_DEPOSIT from contract:",
-          ethers.utils.formatEther(value)
-        );
-      } catch (err) {
-        value = ethers.utils.parseEther(amount || "0.01");
-        console.log("Using fallback value:", ethers.utils.formatEther(value));
-      }
+      const value = ethers.utils.parseEther(amount || "0.02");
+      // try {
+      //   value = await contract.MIN_DEPOSIT();
+      //   console.log(
+      //     "Using MIN_DEPOSIT from contract:",
+      //     ethers.utils.formatEther(value)
+      //   );
+      // } catch (err) {
+      //   value = ethers.utils.parseEther(amount || "0.02");
+      //   console.log("Using fallback value:", ethers.utils.formatEther(value));
+      // }
 
       // Create transaction with proper format for Privy
       const tx = {
