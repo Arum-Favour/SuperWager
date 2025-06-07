@@ -1,14 +1,36 @@
 import PoolContractABI from "@/assets/data/PoolContract.json";
 import { getContractAddress } from "@/utils/privy/addresses";
 import { somniaChain } from "@/utils/privy/chain";
-import { usePrivy, useSendTransaction, useWallets } from "@privy-io/react-auth";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
+import { createWalletClient, custom, parseEther, Chain } from "viem";
+
+// viem-compatible Somnia chain config
+const viemSomniaChain: Chain = {
+  id: 50312,
+  name: "Somnia",
+  // name: "somnia",
+  nativeCurrency: {
+    name: "Somnia Token",
+    symbol: "STT",
+    decimals: 18,
+  },
+  rpcUrls: {
+    default: { http: ["https://dream-rpc.somnia.network"] },
+    public: { http: ["https://dream-rpc.somnia.network"] },
+  },
+  blockExplorers: {
+    default: {
+      name: "Somnia Explorer",
+      url: "", // Add explorer URL if available
+    },
+  },
+};
 
 export function usePoolContract() {
   const { authenticated } = usePrivy();
   const { wallets } = useWallets();
-  const { sendTransaction } = useSendTransaction();
   const [contract, setContract] = useState<ethers.Contract | null>(null);
   const [embeddedWallet, setEmbeddedWallet] = useState<any>(null);
   const [provider, setProvider] =
@@ -35,12 +57,11 @@ export function usePoolContract() {
         }
 
         setEmbeddedWallet(embedded);
-        console.log(embedded);
         const ethProvider = await embedded.getEthereumProvider();
         const ethersProvider = new ethers.providers.Web3Provider(ethProvider);
         setProvider(ethersProvider);
 
-        const contractAddress = getContractAddress(somniaChain.id);
+        const contractAddress = getContractAddress(viemSomniaChain.id);
 
         // Create contract instance - readonly
         const poolContract = new ethers.Contract(
@@ -77,56 +98,39 @@ export function usePoolContract() {
     }
   };
 
-  // Enter the pool by sending STT
+  // Enter the pool by sending STT using viem
   const enterPool = async (amount?: string) => {
-    if (!contract || !provider || !embeddedWallet) {
-      throw new Error("Contract not initialized");
+    if (!embeddedWallet) {
+      throw new Error("Wallet not initialized");
     }
 
     try {
-      // Get MIN_DEPOSIT value
-      const value = ethers.utils.parseEther(amount || "0.02");
-      // try {
-      //   value = await contract.MIN_DEPOSIT();
-      //   console.log(
-      //     "Using MIN_DEPOSIT from contract:",
-      //     ethers.utils.formatEther(value)
-      //   );
-      // } catch (err) {
-      //   value = ethers.utils.parseEther(amount || "0.02");
-      //   console.log("Using fallback value:", ethers.utils.formatEther(value));
-      // }
+      const ethProvider = await embeddedWallet.getEthereumProvider();
+      const client = createWalletClient({
+        chain: viemSomniaChain,
+        transport: custom(ethProvider),
+      });
 
-      // Create transaction with proper format for Privy
-      const tx = {
-        to: contract.address,
-        data: contract.interface.encodeFunctionData("enterPool", []),
-        chainId: somniaChain.id,
-        value: ethers.utils.hexlify(value),
-      };
+      const contractAddress = getContractAddress(viemSomniaChain.id);
+      const value = parseEther(amount || "0.02");
 
-      // UI configuration based on Privy docs
-      const options = {
-        uiOptions: {
-          header: "Enter Betting Pool",
-          description: `Send ${ethers.utils.formatEther(
-            value
-          )} STT to enter the betting pool`,
-          buttonText: "Enter Pool",
-        },
-      };
+      const txHash = await client.writeContract({
+        address: contractAddress as `0x${string}`,
+        abi: PoolContractABI.abi,
+        functionName: "enterPool",
+        value,
+        account: embeddedWallet.address as `0x${string}`,
+      });
 
-      console.log("Sending transaction:", tx);
+      console.log("Transaction sent:", txHash);
 
-      // Proper call format according to docs
-      const { hash } = await sendTransaction(tx, options);
-      console.log("Transaction sent with hash:", hash);
-
-      // Optionally wait for confirmation
-      const receipt = await provider.waitForTransaction(hash);
-      console.log("Transaction confirmed:", receipt);
-
-      return { hash, receipt };
+      // Optionally, wait for confirmation using ethers if you want:
+      if (provider) {
+        const receipt = await provider.waitForTransaction(txHash);
+        console.log("Transaction confirmed:", receipt);
+        return { hash: txHash, receipt };
+      }
+      return { hash: txHash };
     } catch (err) {
       console.error("Error entering pool:", err);
       throw err;
@@ -230,7 +234,6 @@ export function usePoolContract() {
       const minDeposit = await contract.MIN_DEPOSIT();
       const totalBalance = await contract.getPoolBalance();
       const playerCount = await contract.getPlayerCount();
-      const hasEnded = false; // Assuming no direct function for this
       const winnersSelected = await contract.winnersSelected();
 
       console.log("Contract State Debug:");
@@ -273,6 +276,6 @@ export function usePoolContract() {
     isUserWinner,
     getPlayerCount,
     getWalletBalance,
-    debugContractState, // Add this new function
+    debugContractState,
   };
 }
