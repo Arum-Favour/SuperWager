@@ -7,8 +7,8 @@ import { useEffect, useState } from "react";
 
 export function usePoolContract() {
   const { authenticated } = usePrivy();
-  const { sendTransaction } = useSendTransaction();
   const { wallets } = useWallets();
+  const { sendTransaction } = useSendTransaction();
   const [contract, setContract] = useState<ethers.Contract | null>(null);
   const [embeddedWallet, setEmbeddedWallet] = useState<any>(null);
   const [provider, setProvider] =
@@ -35,7 +35,7 @@ export function usePoolContract() {
         }
 
         setEmbeddedWallet(embedded);
-
+        console.log(embedded);
         const ethProvider = await embedded.getEthereumProvider();
         const ethersProvider = new ethers.providers.Web3Provider(ethProvider);
         setProvider(ethersProvider);
@@ -84,26 +84,20 @@ export function usePoolContract() {
     }
 
     try {
-      // Get the MIN_DEPOSIT directly from the contract to ensure exact value
+      // Get MIN_DEPOSIT value
       let value;
       try {
         value = await contract.MIN_DEPOSIT();
         console.log(
-          "Using exact MIN_DEPOSIT from contract:",
+          "Using MIN_DEPOSIT from contract:",
           ethers.utils.formatEther(value)
         );
       } catch (err) {
-        // Fallback if getting MIN_DEPOSIT fails
         value = ethers.utils.parseEther(amount || "0.01");
-        console.log(
-          "Falling back to hardcoded value:",
-          ethers.utils.formatEther(value)
-        );
+        console.log("Using fallback value:", ethers.utils.formatEther(value));
       }
 
-      console.log("Entering pool with wei amount:", value.toString());
-
-      // Create transaction with exact value from contract
+      // Create transaction with proper format for Privy
       const tx = {
         to: contract.address,
         data: contract.interface.encodeFunctionData("enterPool", []),
@@ -111,8 +105,8 @@ export function usePoolContract() {
         value: ethers.utils.hexlify(value),
       };
 
-      // UI configuration - display amount in ETH format
-      const txConfig = {
+      // UI configuration based on Privy docs
+      const options = {
         uiOptions: {
           header: "Enter Betting Pool",
           description: `Send ${ethers.utils.formatEther(
@@ -123,8 +117,16 @@ export function usePoolContract() {
       };
 
       console.log("Sending transaction:", tx);
-      const response = await sendTransaction(tx, txConfig);
-      return response;
+
+      // Proper call format according to docs
+      const { hash } = await sendTransaction(tx, options);
+      console.log("Transaction sent with hash:", hash);
+
+      // Optionally wait for confirmation
+      const receipt = await provider.waitForTransaction(hash);
+      console.log("Transaction confirmed:", receipt);
+
+      return { hash, receipt };
     } catch (err) {
       console.error("Error entering pool:", err);
       throw err;
