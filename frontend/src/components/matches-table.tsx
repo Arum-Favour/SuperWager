@@ -46,20 +46,6 @@ export default function MatchesTable() {
       return;
     }
 
-    if (slips.length >= 10) {
-      toast.error("You can only add up to 10 matches to a slip");
-      return;
-    }
-
-    if (
-      slips.reduce((acc, slip) => acc + parseFloat(slip.odds), 0) +
-        parseFloat(match.odds) >=
-      50
-    ) {
-      toast.error("Total odds cannot exceed 50");
-      return;
-    }
-
     if (
       slips.some(
         (s) => s.homeTeam === match.homeTeam && s.awayTeam === match.awayTeam

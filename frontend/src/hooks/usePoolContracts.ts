@@ -1,10 +1,9 @@
 import PoolContractABI from "@/assets/data/PoolContract.json";
 import { getContractAddress } from "@/utils/privy/addresses";
-import { somniaChain } from "@/utils/privy/chain";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
-import { createWalletClient, custom, parseEther, Chain } from "viem";
+import { Chain, createWalletClient, custom, parseEther } from "viem";
 
 // viem-compatible Somnia chain config
 const viemSomniaChain: Chain = {

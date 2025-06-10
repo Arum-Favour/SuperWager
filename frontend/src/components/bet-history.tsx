@@ -50,13 +50,7 @@ export default function BetHistory() {
           <div
             key={match.poolId}
             onClick={() => setActiveSlip((prev) => (prev === idx ? null : idx))}
-            className={`space-y-4 ${
-              activeSlip === idx
-                ? "bg-[#F2F9FF]"
-                : match.hasWon === "won"
-                ? "bg-[#32FF401A]"
-                : "bg-[#F9070B1A]"
-            } rounded-xl md:rounded-3xl p-3 md:p-6 cursor-pointer duration-0`}
+            className={`space-y-4 bg-[#F2F9FF] rounded-xl md:rounded-3xl p-3 md:p-6 cursor-pointer duration-0`}
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-4 text-xs min-[420px]:text-sm sm:text-base md:text-lg">
               <h4 className="col-span-2 sm:col-span-1">

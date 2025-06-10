@@ -1,5 +1,6 @@
 "use client";
 
+import TrophyIcon from "@/assets/svgs/trophy";
 import { useAuthModal } from "@/context/AuthModalContext";
 import { useBettingSlips } from "@/context/useBettingSlips";
 import { fetchMatches } from "@/utils/queries";
@@ -11,7 +12,6 @@ import Confetti from "react-confetti";
 import EnterPoolModal from "./enter-pool-modal";
 import Loader from "./loader";
 import SlipCard from "./slip-card";
-import TrophyIcon from "@/assets/svgs/trophy";
 
 const calcScore = (slips: BettingSlip[]) => {
   const totalOdds = slips.reduce((acc, slip) => acc + parseFloat(slip.odds), 0);
@@ -21,7 +21,7 @@ const calcScore = (slips: BettingSlip[]) => {
     0
   );
 
-  return oddsWon / totalOdds + oddsWon;
+  return (oddsWon / totalOdds) * oddsWon;
 };
 
 export default function BettingSlip() {
@@ -32,9 +32,7 @@ export default function BettingSlip() {
     poolId,
     hasEnteredPool,
     hasPoolEnded,
-    hasWon,
     updateSlipStatus,
-    setSlipOutcome,
     resetSlip,
   } = useBettingSlips();
 
@@ -95,15 +93,10 @@ export default function BettingSlip() {
   }, [scoresData, hasPoolEnded]);
 
   useEffect(() => {
-    if (hasPoolEnded && hasWon === "pending" && slips.length > 0)
-      setSlipOutcome();
-  }, [hasPoolEnded, hasWon, slips]);
-
-  useEffect(() => {
     if (!hasPoolEnded) return;
 
-    setShowConfetti(hasPoolEnded && hasWon === "won");
-  }, [hasPoolEnded, hasWon]);
+    setShowConfetti(hasPoolEnded);
+  }, [hasPoolEnded]);
 
   if (!userData.user_id)
     return (
@@ -126,11 +119,13 @@ export default function BettingSlip() {
 
   return (
     <>
-      {hasWon !== "pending" && (
+      {hasPoolEnded && (
         <div className="fixed inset-0 items-center justify-center flex z-50 p-4">
           <div className="absolute inset-0 bg-black/50" />
-          <div className="bg-white rounded-4xl p-8 md:p-16 relative flex flex-col items-center justify-center gap-6 md:gap-10 max-w-lg w-full">
-            <h4 className="text-xl font-sembold">Congratulations</h4>
+          <div className="bg-white rounded-4xl p-8 relative flex flex-col items-center justify-center gap-6 md:gap-10 max-w-lg w-full">
+            <h4 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl text-[var(--primary)] font-sembold">
+              Congratulations
+            </h4>
             <div>
               <TrophyIcon />
             </div>
@@ -138,12 +133,20 @@ export default function BettingSlip() {
               <p>You finished 12th in the pool</p>
               <p>Total points obtained: {calcScore(slips).toFixed(2)}</p>
             </div>
-            <button
-              onClick={resetSlip}
-              className="w-full md:text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-4 text-white capitalize hover:bg-[var(--primary)]/80"
-            >
-              Next
-            </button>
+            <div className="flex items-center gap-4 justify-center">
+              <Link href={"/leaderboard"}>
+                <button className="border border-[var(--primary)] rounded-lg px-3.5 py-4 md:text-lg text-[var(--primary)]">
+                  Check leaderboard
+                </button>
+              </Link>
+
+              <button
+                onClick={resetSlip}
+                className="md:text-lg bg-[var(--primary)] rounded-lg px-3.5 py-4 text-white hover:bg-[var(--primary)]/80"
+              >
+                Open betslip
+              </button>
+            </div>
           </div>
         </div>
       )}

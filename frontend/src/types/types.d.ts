@@ -69,5 +69,4 @@ type GameState = {
   poolId: string | null;
   hasPoolStarted: boolean;
   hasPoolEnded: boolean;
-  hasWon: MatchOutcome;
 };
