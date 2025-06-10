@@ -27,7 +27,6 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
     hasEnteredPool,
     hasPoolStarted,
     hasPoolEnded,
-    hasWon,
     setHasEnteredPool,
   } = useBettingSlips();
 
@@ -112,7 +111,6 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
           hasEnteredPool: true,
           hasPoolStarted,
           hasPoolEnded,
-          hasWon,
         })
       );
     } catch (error) {

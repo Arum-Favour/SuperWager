@@ -9,7 +9,7 @@ import React, {
 } from "react";
 
 const BettingSlipsContext = createContext<
-  | {
+  | (GameState & {
       addSlip: (slip: BettingSlip) => void;
       removeSlip: (slip: BettingSlip) => void;
       setHasEnteredPool: (val: boolean) => void;
@@ -22,14 +22,7 @@ const BettingSlipsContext = createContext<
         finalAwayScore: number
       ) => void;
       resetSlip: () => void;
-      setSlipOutcome: () => void;
-      slips: BettingSlip[];
-      hasEnteredPool: boolean;
-      hasPoolStarted: boolean;
-      poolId: string | null;
-      hasPoolEnded: boolean;
-      hasWon: MatchOutcome;
-    }
+    })
   | undefined
 >(undefined);
 
@@ -39,27 +32,12 @@ const initialState: GameState = {
   poolId: null,
   hasPoolStarted: false,
   hasPoolEnded: false,
-  hasWon: "pending",
 };
 
 export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [gameState, setGameState] = useState<GameState>(initialState);
-
-  const setSlipOutcome = () => {
-    const updatedSlips: GameState = {
-      ...gameState,
-      hasWon: gameState.slips.some((slip) => slip.outcome === "lost")
-        ? "lost"
-        : gameState.slips.some((slip) => slip.outcome === "pending")
-        ? "pending"
-        : "won",
-    };
-
-    setGameState(updatedSlips);
-    localStorage.setItem("game", JSON.stringify(updatedSlips));
-  };
 
   const resetSlip = () => {
     const history = [
@@ -110,9 +88,10 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
     localStorage.setItem("game", JSON.stringify(gameState));
   };
 
-  const updateSlipStatus = (val: boolean) => {
-    setGameState((prev) => ({ ...prev, hasPoolEnded: val }));
-    localStorage.setItem("game", JSON.stringify(gameState));
+  const updateSlipStatus = (hasPoolEnded: boolean) => {
+    const updatedSlips: GameState = { ...gameState, hasPoolEnded };
+    setGameState(updatedSlips);
+    localStorage.setItem("game", JSON.stringify(updatedSlips));
   };
 
   const updateGameOutcome = (
@@ -164,7 +143,6 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
         updateSlipStatus,
         updateGameOutcome,
         resetSlip,
-        setSlipOutcome,
         ...gameState,
       }}
     >
