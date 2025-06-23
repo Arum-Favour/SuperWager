@@ -36,11 +36,8 @@ export default function SlipCard({
       !match ||
       new Date(match.sport_event.start_time) > new Date() ||
       match.sport_event_status.match_status !== "ended"
-    ) {
-      updateGameOutcome("pending", idx, homeScore, awayScore);
-      setMatchOutcome("pending");
+    )
       return;
-    }
 
     const selection = game.selection.toLowerCase();
     const isHomeWin = homeScore > awayScore;

@@ -93,7 +93,7 @@ export default function BettingSlip() {
   }, [scoresData, hasPoolEnded]);
 
   useEffect(() => {
-    if (!hasPoolEnded) return;
+    if (!hasPoolEnded || !slips.length) return;
 
     setShowConfetti(hasPoolEnded);
   }, [hasPoolEnded]);
