@@ -48,7 +48,7 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
     localStorage.setItem("history", JSON.stringify(history));
 
     setGameState(initialState);
-    localStorage.setItem("game", JSON.stringify(initialState));
+    localStorage.removeItem("game");
   };
 
   const addSlip = (slip: BettingSlip) => {

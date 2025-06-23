@@ -1,41 +1,70 @@
 export const radar_leagues = [
-    {
+  {
+    id: "sr:competition:357",
+    name: "FIFA Club World Cup",
+    odds: "sr:tournament:357",
+    season_id: "sr:season:126393",
+  },
+  {
     id: "sr:competition:242",
     odds: "sr:tournament:242",
     name: "MLS",
     season_id: "sr:season:127179",
   },
   {
-    id: "sr:competition:17",
-    odds: "sr:tournament:17",
-    name: "Premier League",
-    season_id: "sr:season:118689",
+    id: "sr:competition:649",
+    odds: "sr:tournament:649",
+    name: "Chinese Super League",
+    season_id: "sr:season:128235",
   },
   {
-    id: "sr:competition:8",
-    odds: "sr:tournament:8",
-    name: "La Liga",
-    season_id: "sr:season:118691",
+    id: "sr:competition:410",
+    odds: "sr:tournament:410",
+    name: "K-League 1",
+    season_id: "sr:season:127773",
   },
   {
-    id: "sr:competition:34",
-    odds: "sr:tournament:34",
-    name: "Ligue 1",
-    season_id: "sr:season:119835",
+    id: "sr:competition:196",
+    name: "J.League",
+    odds: "sr:tournament:196",
+    season_id: "sr:season:127083",
   },
   {
-    id: "sr:competition:23",
-    odds: "sr:tournament:23",
-    name: "Serie A",
-    season_id: "sr:season:118975",
+    id: "sr:competition:325",
+    odds: "sr:tournament:325",
+    name: "Brasileiro Serie A",
+    season_id: "sr:season:128461",
   },
-  {
-    id: "sr:competition:35",
-    odds: "sr:tournament:35",
-    name: "Bundesliga",
-    season_id: "sr:season:118693",
-  },
-
+  // {
+  //   id: "sr:competition:17",
+  //   odds: "sr:tournament:17",
+  //   name: "Premier League",
+  //   season_id: "sr:season:118689",
+  // },
+  // {
+  //   id: "sr:competition:8",
+  //   odds: "sr:tournament:8",
+  //   name: "La Liga",
+  //   season_id: "sr:season:118691",
+  // },
+  // {
+  //   id: "sr:competition:34",
+  //   odds: "sr:tournament:34",
+  //   name: "Ligue 1",
+  //   season_id: "sr:season:119835",
+  // },
+  // {
+  //   id: "sr:competition:23",
+  //   odds: "sr:tournament:23",
+  //   name: "Serie A",
+  //   season_id: "sr:season:118975",
+  // },
+  // {
+  //   id: "sr:competition:35",
+  //   odds: "sr:tournament:35",
+  //   name: "Bundesliga",
+  //   season_id: "sr:season:118693",
+  // },
 ];
 
 // {
