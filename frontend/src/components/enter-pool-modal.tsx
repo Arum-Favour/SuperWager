@@ -118,8 +118,16 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
 
       const errorMessage =
         error instanceof Error ? error.message : "something went wrong";
-      toast.error(errorMessage);
-      setError(errorMessage);
+      toast.error(
+        errorMessage.includes("Pool duration has ended")
+          ? "Pool duration has ended, you cannot enter now."
+          : errorMessage
+      );
+      setError(
+        errorMessage.includes("Pool duration has ended")
+          ? "Pool duration has ended, you cannot enter now."
+          : errorMessage
+      );
     }
 
     setLoading(false);
