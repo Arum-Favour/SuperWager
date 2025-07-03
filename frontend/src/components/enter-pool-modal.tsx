@@ -1,6 +1,4 @@
 import CancelXIcon from "@/assets/svgs/cancel-x";
-import GreaterThan from "@/assets/svgs/double-greaterthan";
-import LessThan from "@/assets/svgs/double-lessthan";
 import { useAuthModal } from "@/context/AuthModalContext";
 import { useBettingSlips } from "@/context/useBettingSlips";
 import { usePoolContract } from "@/hooks/usePoolContracts";
