@@ -111,7 +111,7 @@ export function usePoolContract() {
       });
 
       const contractAddress = getContractAddress(viemSomniaChain.id);
-      const value = parseEther(amount || "0.02");
+      const value = parseEther(amount || "0.1");
 
       const txHash = await client.writeContract({
         address: contractAddress as `0x${string}`,
