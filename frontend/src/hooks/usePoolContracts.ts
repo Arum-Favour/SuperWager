@@ -64,7 +64,7 @@ export function usePoolContract() {
 
         // Create contract instance - readonly
         const poolContract = new ethers.Contract(
-          contractAddress,
+          contractAddress as string,
           PoolContractABI.abi,
           ethersProvider
         );

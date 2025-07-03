@@ -1,7 +1,6 @@
 export const CONTRACTS = {
   "0xc488": {
-    // Somnia network ID (50312 in decimal)
-    POOL_CONTRACT: "0xCE25cf51550D16A2e8cE3FCa8A8B0b033dbE6993", // Replace with your actual contract address
+    POOL_CONTRACT: process.env.NEXT_PUBLIC_POOL_CONTARCT_ADDRESS, // Replace with your actual contract address
   },
 };
 
