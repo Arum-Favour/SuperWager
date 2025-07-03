@@ -34,13 +34,13 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
     userData: { balance = "0.00" },
   } = useAuthModal();
 
-  const [poolOption, setPoolOption] = useState("0.02");
+  const [poolOption, setPoolOption] = useState("0.1");
 
   const increase = () =>
-    setPoolOption((prev) => (parseFloat(prev) + 0.01).toFixed(2));
+    setPoolOption((prev) => (parseFloat(prev) + 0.1).toFixed(2));
 
   const decrease = () =>
-    setPoolOption((prev) => Math.max(0.02, parseFloat(prev) - 0.01).toFixed(2));
+    setPoolOption((prev) => Math.max(0.2, parseFloat(prev) - 0.1).toFixed(2));
 
   const [loading, setLoading] = useState(false);
   const [poolBalance, setPoolBalance] = useState<string>("0");
@@ -155,22 +155,20 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
               Enter Pool
             </p>
             <div className="rounded-[10px] gap-3 md:gap-5 px-3 md:px-6 py-2 md:py-4 bg-[var(--primary-light)] flex items-center justify-center">
-              <span className="cursor-pointer" onClick={decrease}>
+              {/* <span className="cursor-pointer" onClick={decrease}>
                 <LessThan className="size-4 md:size-6" />
-              </span>
+              </span> */}
               <p className="text-sm sm:text-xl md:text-2xl">{poolOption} SST</p>
-              <span className="cursor-pointer" onClick={increase}>
+              {/* <span className="cursor-pointer" onClick={increase}>
                 <GreaterThan className="size-4 md:size-6" />
-              </span>
+              </span> */}
             </div>
           </div>
           <div className="flex justify-between items-center gap-4">
             <p className="text-sm sm:text-xl md:text-2xl font-medium">
               Wallet balance
             </p>
-            <p className="text-sm sm:text-xl md:text-2xl">
-              {balance || 0.0} STT
-            </p>
+            <p className="text-sm sm:text-xl md:text-2xl">{balance} STT</p>
           </div>
           <div className="flex justify-between items-center gap-4">
             <p className="text-sm sm:text-xl md:text-2xl font-medium">

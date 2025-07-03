@@ -14,12 +14,19 @@ import Loader from "./loader";
 import SlipCard from "./slip-card";
 
 const calcScore = (slips: BettingSlip[]) => {
-  const totalOdds = slips.reduce((acc, slip) => acc + parseFloat(slip.odds), 0);
+  if (!slips.length) return 0;
 
-  const oddsWon = slips.reduce(
-    (acc, slip) => acc + (slip.outcome === "won" ? parseFloat(slip.odds) : 0),
-    0
-  );
+  const totalOdds = slips.reduce((acc, slip) => {
+    const odds = parseFloat(slip.odds) || 0;
+    return acc + odds;
+  }, 0);
+
+  if (totalOdds <= 0) return 0;
+
+  const oddsWon = slips.reduce((acc, slip) => {
+    if (slip.outcome !== "won") return acc;
+    return acc + (parseFloat(slip.odds) || 0);
+  }, 0);
 
   return (oddsWon / totalOdds) * oddsWon;
 };
@@ -34,6 +41,7 @@ export default function BettingSlip() {
     hasPoolEnded,
     updateSlipStatus,
     resetSlip,
+    hasPoolStarted,
   } = useBettingSlips();
 
   const { userData } = useAuthModal();
@@ -77,7 +85,7 @@ export default function BettingSlip() {
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    if (!scoresData.length || hasPoolEnded) return;
+    if (!hasPoolStarted || !scoresData.length || hasPoolEnded) return;
 
     const checkPoolEnded = () => {
       const hasPoolEnded = scoresData.every(

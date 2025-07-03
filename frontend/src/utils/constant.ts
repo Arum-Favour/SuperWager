@@ -12,6 +12,12 @@ export const radar_leagues = [
     season_id: "sr:season:127179",
   },
   {
+    id: "sr:competition:20",
+    odds: "sr:tournament:20",
+    name: "Eliteserien",
+    season_id: "sr:season:127337",
+  },
+  {
     id: "sr:competition:649",
     odds: "sr:tournament:649",
     name: "Chinese Super League",
