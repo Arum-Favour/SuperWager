@@ -12,6 +12,7 @@ import Confetti from "react-confetti";
 import EnterPoolModal from "./enter-pool-modal";
 import Loader from "./loader";
 import SlipCard from "./slip-card";
+import axios from "axios";
 
 const calcScore = (slips: BettingSlip[]) => {
   if (!slips.length) return 0;
@@ -61,7 +62,10 @@ export default function BettingSlip() {
     queryKey: ["scores", betslipLeagues],
     queryFn: async () => {
       const results = await Promise.all(
-        betslipLeagues.map((league) => fetchMatches(league))
+        betslipLeagues.map(async (league) => {
+          const res = await axios.get(`/api/fetch-matches?season_id=${league}`);
+          return res.data;
+        })
       );
 
       const flattedResult = results.map((res) => res.schedules).flat();
@@ -79,6 +83,8 @@ export default function BettingSlip() {
       return slipMatches;
     },
     refetchOnWindowFocus: true,
+    retry: 2,
+    retryDelay: 5000,
     // staleTime: 10000,
   });
 
