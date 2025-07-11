@@ -3,7 +3,6 @@
 import { radar_leagues } from "@/utils/constant";
 import { fetchMatches, fetchOdds } from "@/utils/queries";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { createContext, useContext, useState } from "react";
 
 type MatchesContextType = {
@@ -39,14 +38,9 @@ export const MatchesProvider = ({
     new Date().toDateString()
   );
 
-  const { data, isLoading, isError } = useQuery<SportEventSchedule>({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["matches", radar_leagues[league].season_id],
-    queryFn: async () => {
-      const res = await axios.get(
-        `/api/fetch-matches?season_id=${radar_leagues[league].season_id}`
-      );
-      return res.data;
-    },
+    queryFn: async () => await fetchMatches(radar_leagues[league].season_id),
     refetchOnWindowFocus: true,
     retry: 2,
     retryDelay: 5000,
@@ -63,12 +57,7 @@ export const MatchesProvider = ({
 
   const { data: odds } = useQuery<SportOddsData>({
     queryKey: ["odds", radar_leagues[league].odds],
-    queryFn: async () => {
-      const res = await axios.get(
-        `/api/fetch-odds?tournament_id=${radar_leagues[league].odds}`
-      );
-      return res.data;
-    },
+    queryFn: async () => await fetchOdds(radar_leagues[league].odds),
     refetchOnWindowFocus: true,
     retry: 2,
     retryDelay: 5000,
