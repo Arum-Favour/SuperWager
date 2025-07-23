@@ -198,27 +198,52 @@ export const updatePoolParticipation = async (walletAddress: string, isParticipa
 // Get pool participants
 export const getPoolParticipants = async (): Promise<LeaderboardEntry[]> => {
   try {
-    // Return mock participants for development
-    const mockParticipants = [
-      {
-        id: "1",
-        walletAddress: "0x1234567890123456789012345678901234567890",
-        totalBets: 25,
-        settledBets: 20,
-        wonBets: 15,
-        lostBets: 5,
-        totalOddsWon: 32.5,
-        totalOddsConcluded: 45.0,
-        accuracy: 0.72,
-        oddsProduct: 156.8,
-        lastUpdated: Date.now(),
-        poolParticipant: true,
-        rank: 1,
-        score: 3.6
-      }
-    ];
+    const q = query(
+      collection(db, 'userStats'),
+      where('poolParticipant', '==', true),
+      orderBy('accuracy', 'desc'),
+      limit(50)
+    );
     
-    return mockParticipants;
+    const querySnapshot = await getDocs(q);
+    const participants = querySnapshot.docs.map((doc, index) => ({
+      id: doc.id,
+      rank: index + 1,
+      score: doc.data().accuracy * Math.log(doc.data().oddsProduct || 1),
+      ...doc.data()
+    } as LeaderboardEntry));
+    
+    console.log(`🎯 Fetched ${participants.length} pool participants from Firebase`);
+    return participants;
+    
+  } catch (error) {
+    console.error('Error getting pool participants:', error);
+    return [];
+  }
+};
+// export const getPoolParticipants = async (): Promise<LeaderboardEntry[]> => {
+//   try {
+//     // Return mock participants for development
+//     const mockParticipants = [
+//       {
+//         id: "1",
+//         walletAddress: "0x1234567890123456789012345678901234567890",
+//         totalBets: 25,
+//         settledBets: 20,
+//         wonBets: 15,
+//         lostBets: 5,
+//         totalOddsWon: 32.5,
+//         totalOddsConcluded: 45.0,
+//         accuracy: 0.72,
+//         oddsProduct: 156.8,
+//         lastUpdated: Date.now(),
+//         poolParticipant: true,
+//         rank: 1,
+//         score: 3.6
+//       }
+//     ];
+    
+//     return mockParticipants;
 
 
     // When Firebase is configured, uncomment:
@@ -244,8 +269,8 @@ export const getPoolParticipants = async (): Promise<LeaderboardEntry[]> => {
     //     ...participant,
     //     rank: index + 1
     //   })) as LeaderboardEntry[];
-  } catch (error) {
-    console.error('Error getting pool participants:', error);
-    return [];
-  }
-};
+//   } catch (error) {
+//     console.error('Error getting pool participants:', error);
+//     return [];
+//   }
+// };
