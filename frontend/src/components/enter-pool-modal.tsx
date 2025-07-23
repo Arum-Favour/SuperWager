@@ -347,7 +347,7 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
 
       if (userWalletAddress) {
         // Mark user as pool participant in Firebase
-        // await updatePoolParticipation(userWalletAddress, true);
+        await updatePoolParticipation(userWalletAddress, true);
         // await addBet({
         //   walletAddress: userWalletAddress,
         //   userId: user_id,
