@@ -240,17 +240,15 @@
 //   );
 // }
 
-
 import CancelXIcon from "@/assets/svgs/cancel-x";
 import { useAuthModal } from "@/context/AuthModalContext";
 import { useBettingSlips } from "@/context/useBettingSlips";
 import { usePoolContract } from "@/hooks/usePoolContracts";
+import { addBet, updatePoolParticipation } from "@/lib/firebase/firestore";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { Loader2, Plus, TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-// Add Firebase imports
-import { updatePoolParticipation, initializeUserStats } from "@/lib/firebase/firestore";
 
 export default function EnterPoolModal({ close }: { close: () => void }) {
   const { authenticated, login, user } = usePrivy();
@@ -274,7 +272,7 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
   } = useBettingSlips();
 
   const {
-    userData: { balance = "0.00", walletAddress },
+    userData: { balance = "0.00", walletAddress, user_id },
   } = useAuthModal();
 
   const [poolOption, setPoolOption] = useState("0.1");
@@ -346,22 +344,31 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
 
       // Get user's wallet address for Firebase
       const userWalletAddress = walletAddress || user?.wallet?.address;
-      
+
       if (userWalletAddress) {
-        // Initialize user stats in Firebase if they don't exist
-        await initializeUserStats(userWalletAddress);
-        
         // Mark user as pool participant in Firebase
-        await updatePoolParticipation(userWalletAddress, true);
-        
-        console.log(`✅ User ${userWalletAddress} marked as pool participant in Firebase`);
-      } else {
-        console.warn("⚠️ Could not get wallet address for Firebase sync");
-      }
+        // await updatePoolParticipation(userWalletAddress, true);
+        // await addBet({
+        //   walletAddress: userWalletAddress,
+        //   userId: user_id,
+        //   odds: slips.reduce((acc, slip) => acc * parseFloat(slip.odds), 0),
+        //   stake: parseFloat(poolOption),
+        //   timestamp: Date.now(),
+        //   status: "pending",
+        //   slips,
+        //   poolId,
+        //   hasEnteredPool,
+        //   hasPoolEnded,
+        //   hasPoolStarted,
+        // });
+
+        console.log(
+          `✅ User ${userWalletAddress} marked as pool participant in Firebase`
+        );
+      } else console.warn("⚠️ Could not get wallet address for Firebase sync");
 
       setHasEnteredPool(true);
       toast.success("You have entered the pool");
-      close();
       localStorage.setItem(
         "game",
         JSON.stringify({
@@ -372,6 +379,7 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
           hasPoolEnded,
         })
       );
+      close();
     } catch (error) {
       console.error("Failed to enter pool:", error);
 

@@ -14,10 +14,7 @@ export default function Navbar() {
         </div>
         <nav className="hidden lg:flex gap-6 items-center justify-center">
           {[
-            // { label: "Sports", href: "/sports" },
-            // { label: "Leaderboard", href: "/leaderboard" },
-            // { label: "Player Support", href: "/player-support" },
-            // { label: "Contact", href: "/contact" },
+            { label: "Leaderboard", href: "/leaderboard" },
             { label: "Create Slip", href: "/create-slip" },
             { label: "Bet Slip", href: "/betting-slips" },
             { label: "Bet History", href: "/bet-history" },

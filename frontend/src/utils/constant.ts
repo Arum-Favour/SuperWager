@@ -1,11 +1,5 @@
 export const radar_leagues = [
   {
-    id: "sr:competition:357",
-    name: "FIFA Club World Cup",
-    odds: "sr:tournament:357",
-    season_id: "sr:season:126393",
-  },
-  {
     id: "sr:competition:242",
     odds: "sr:tournament:242",
     name: "MLS",

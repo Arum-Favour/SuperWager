@@ -45,18 +45,16 @@
 //   lastUpdated: number;
 // }
 
-export interface BetData {
+export interface BetData extends GameState {
   id: string;
   userId: string;
   walletAddress: string;
-  matchId: string;
-  selection: string;
   odds: number;
   stake: number;
-  potentialWin: number;
   timestamp: number;
-  status: 'pending' | 'won' | 'lost';
+  status: "pending" | "won" | "lost";
   settled: boolean;
+  potentialWin?: number;
   settledAt?: number;
 }
 
