@@ -61,7 +61,7 @@ export default function BettingSlip() {
     queryKey: ["scores", betslipLeagues],
     queryFn: async () => {
       const results = await Promise.all(
-        betslipLeagues.map((league) => fetchMatches(league))
+        betslipLeagues.map(async (league) => fetchMatches(league))
       );
 
       const flattedResult = results.map((res) => res.schedules).flat();
@@ -79,6 +79,8 @@ export default function BettingSlip() {
       return slipMatches;
     },
     refetchOnWindowFocus: true,
+    retry: 2,
+    retryDelay: 5000,
     // staleTime: 10000,
   });
 

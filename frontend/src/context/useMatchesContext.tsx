@@ -42,6 +42,8 @@ export const MatchesProvider = ({
     queryKey: ["matches", radar_leagues[league].season_id],
     queryFn: async () => await fetchMatches(radar_leagues[league].season_id),
     refetchOnWindowFocus: true,
+    retry: 2,
+    retryDelay: 5000,
     // staleTime: 10000,
   });
 
@@ -53,10 +55,12 @@ export const MatchesProvider = ({
       return matchDate === new Date(startingDate).toDateString();
     }) || [];
 
-  const { data: odds } = useQuery({
+  const { data: odds } = useQuery<SportOddsData>({
     queryKey: ["odds", radar_leagues[league].odds],
     queryFn: async () => await fetchOdds(radar_leagues[league].odds),
     refetchOnWindowFocus: true,
+    retry: 2,
+    retryDelay: 5000,
   });
 
   return (

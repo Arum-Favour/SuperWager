@@ -17,3 +17,5 @@ export const daysArray = Array.from({ length: 5 }).map((_, i) => {
     date: date.toDateString(),
   };
 });
+
+export const base_url = process.env.BASE_URL || "http://localhost:3000";

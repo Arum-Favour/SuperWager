@@ -39,6 +39,13 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [gameState, setGameState] = useState<GameState>(initialState);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("game");
+      if (stored) setGameState(JSON.parse(stored));
+    }
+  }, []);
+
   const resetSlip = () => {
     const history = [
       gameState,
@@ -110,28 +117,27 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   useEffect(() => {
-    if (gameState.hasPoolStarted) return;
+    if (gameState.hasPoolStarted || gameState.slips.length === 0) return;
 
     const interval = setInterval(() => {
-      if (gameState.slips.length === 0) return;
       const hasStarted = gameState.slips.some(
         (slip) => new Date(slip.matchDate) <= new Date()
       );
-      if (hasStarted && gameState.hasEnteredPool) {
+      if (hasStarted) {
+        if (!gameState.hasEnteredPool) {
+          setGameState(initialState);
+          localStorage.removeItem("game");
+          clearInterval(interval);
+          return;
+        }
         setGameState((prev) => ({ ...prev, hasPoolStarted: true }));
         localStorage.setItem("game", JSON.stringify(gameState));
-
         clearInterval(interval);
       }
     }, 5000);
 
     return () => clearInterval(interval);
   }, [gameState.slips, gameState.hasEnteredPool, gameState.hasPoolStarted]);
-
-  useEffect(() => {
-    const storedGameState = localStorage.getItem("game");
-    if (storedGameState) setGameState(JSON.parse(storedGameState));
-  }, []);
 
   return (
     <BettingSlipsContext.Provider
