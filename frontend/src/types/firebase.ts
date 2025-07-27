@@ -91,3 +91,43 @@ export interface PoolData {
   endTime?: number;
   lastUpdated: number;
 }
+
+// Add this interface to your existing types
+
+export interface StoredBettingSlip {
+  id?: string;
+  walletAddress: string;
+  poolId: string;
+  slips: {
+    homeTeam: string;
+    awayTeam: string;
+    selection: string;
+    odds: string;
+    outcome: 'won' | 'lost' | 'pending';
+    matchDate: string;
+    league_key: string;
+    homeScore?: number;
+    awayScore?: number;
+    settledAt?: Date;
+  }[];
+  poolAmount: string;
+  entryTime: Date;
+  totalOdds: number;
+  slipCount: number;
+  status: 'active' | 'completed' | 'cancelled';
+  createdAt: Date;
+  lastUpdated: Date;
+}
+
+// Update your existing BettingSlip interface if needed
+export interface BettingSlip {
+  homeTeam: string;
+  awayTeam: string;
+  selection: string;
+  odds: string;
+  outcome?: 'won' | 'lost' | 'pending';
+  matchDate: string;
+  league_key: string;
+  homeScore?: number;
+  awayScore?: number;
+}

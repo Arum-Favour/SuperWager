@@ -1,4 +1,5 @@
 "use client";
+import { useBettingSlipSync } from "@/hooks/useBettingSlipSync";
 
 import TrophyIcon from "@/assets/svgs/trophy";
 import { useAuthModal } from "@/context/AuthModalContext";
@@ -81,6 +82,8 @@ export default function BettingSlip() {
     refetchOnWindowFocus: true,
     // staleTime: 10000,
   });
+  
+  useBettingSlipSync(scoresData);
 
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -232,3 +235,4 @@ export default function BettingSlip() {
     </>
   );
 }
+

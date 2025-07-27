@@ -274,3 +274,203 @@ export const getPoolParticipants = async (): Promise<LeaderboardEntry[]> => {
 //     return [];
 //   }
 // };
+
+// Add these functions to your existing firestore.ts file
+
+// Store user's betting slip when entering pool
+export const storeBettingSlip = async (
+  walletAddress: string, 
+  slipData: {
+    poolId: string;
+    slips: BettingSlip[];
+    poolAmount: string;
+    entryTime: Date;
+  }
+) => {
+  try {
+    const slipRef = doc(db, 'bettingSlips', `${walletAddress}_${slipData.poolId}`);
+    
+    const bettingSlipData = {
+      walletAddress,
+      poolId: slipData.poolId,
+      slips: slipData.slips.map(slip => ({
+        homeTeam: slip.homeTeam,
+        awayTeam: slip.awayTeam,
+        selection: slip.selection,
+        odds: slip.odds,
+        outcome: slip.outcome || 'pending',
+        matchDate: slip.matchDate,
+        league_key: slip.league_key,
+      })),
+      poolAmount: slipData.poolAmount,
+      entryTime: slipData.entryTime,
+      totalOdds: slipData.slips.reduce((acc, slip) => acc + parseFloat(slip.odds), 0),
+      slipCount: slipData.slips.length,
+      status: 'active',
+      createdAt: new Date(),
+      lastUpdated: new Date(),
+    };
+    
+    await setDoc(slipRef, bettingSlipData);
+    console.log(`✅ Stored betting slip for ${walletAddress} in pool ${slipData.poolId}`);
+    
+    return bettingSlipData;
+  } catch (error) {
+    console.error('Error storing betting slip:', error);
+    throw error;
+  }
+};
+
+// Get user's betting slips
+export const getUserBettingSlips = async (walletAddress: string) => {
+  try {
+    const q = query(
+      collection(db, 'bettingSlips'),
+      where('walletAddress', '==', walletAddress),
+      orderBy('entryTime', 'desc'),
+      limit(10)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    const slips = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    return slips;
+  } catch (error) {
+    console.error('Error getting user betting slips:', error);
+    return [];
+  }
+};
+
+// Update betting slip outcome when matches are settled
+export const updateBettingSlipOutcome = async (
+  walletAddress: string,
+  poolId: string,
+  matchIndex: number,
+  outcome: 'won' | 'lost' | 'pending',
+  homeScore?: number,
+  awayScore?: number
+) => {
+  try {
+    const slipRef = doc(db, 'bettingSlips', `${walletAddress}_${poolId}`);
+    const slipDoc = await getDoc(slipRef);
+    
+    if (!slipDoc.exists()) {
+      console.warn(`Betting slip not found for ${walletAddress}_${poolId}`);
+      return;
+    }
+    
+    const slipData = slipDoc.data();
+    const updatedSlips = [...slipData.slips];
+    
+    if (updatedSlips[matchIndex]) {
+      updatedSlips[matchIndex] = {
+        ...updatedSlips[matchIndex],
+        outcome,
+        homeScore,
+        awayScore,
+        settledAt: new Date(),
+      };
+      
+      await updateDoc(slipRef, {
+        slips: updatedSlips,
+        lastUpdated: new Date(),
+      });
+      
+      console.log(`✅ Updated slip outcome for ${walletAddress} match ${matchIndex}: ${outcome}`);
+    }
+  } catch (error) {
+    console.error('Error updating betting slip outcome:', error);
+    throw error;
+  }
+};
+
+// Get all betting slips for a specific pool (for analytics)
+export const getPoolBettingSlips = async (poolId: string) => {
+  try {
+    const q = query(
+      collection(db, 'bettingSlips'),
+      where('poolId', '==', poolId),
+      orderBy('entryTime', 'desc')
+    );
+    
+    const querySnapshot = await getDocs(q);
+    const slips = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    return slips;
+  } catch (error) {
+    console.error('Error getting pool betting slips:', error);
+    return [];
+  }
+};
+
+// Calculate and update user stats based on betting slip results
+export const updateUserStatsFromSlip = async (
+  walletAddress: string,
+  poolId: string
+) => {
+  try {
+    const slipRef = doc(db, 'bettingSlips', `${walletAddress}_${poolId}`);
+    const slipDoc = await getDoc(slipRef);
+    
+    if (!slipDoc.exists()) return;
+    
+    const slipData = slipDoc.data();
+    const slips = slipData.slips;
+    
+    // Calculate stats from this slip
+    const totalBets = slips.length;
+    const settledBets = slips.filter((s: any) => s.outcome !== 'pending').length;
+    const wonBets = slips.filter((s: any) => s.outcome === 'won').length;
+    const lostBets = slips.filter((s: any) => s.outcome === 'lost').length;
+    
+    const totalOddsWon = slips
+      .filter((s: any) => s.outcome === 'won')
+      .reduce((acc: number, slip: any) => acc + parseFloat(slip.odds), 0);
+    
+    const accuracy = settledBets > 0 ? wonBets / settledBets : 0;
+    
+    // Update user stats
+    const userRef = doc(db, 'userStats', walletAddress);
+    const userDoc = await getDoc(userRef);
+    
+    let currentStats = {
+      totalBets: 0,
+      settledBets: 0,
+      wonBets: 0,
+      lostBets: 0,
+      totalOddsWon: 0,
+      accuracy: 0,
+    };
+    
+    if (userDoc.exists()) {
+      currentStats = userDoc.data() as any;
+    }
+    
+    const newStats = {
+      totalBets: (currentStats.totalBets || 0) + totalBets,
+      settledBets: (currentStats.settledBets || 0) + settledBets,
+      wonBets: (currentStats.wonBets || 0) + wonBets,
+      lostBets: (currentStats.lostBets || 0) + lostBets,
+      totalOddsWon: (currentStats.totalOddsWon || 0) + totalOddsWon,
+      lastUpdated: new Date(),
+      accuracy: 0,
+    };
+    
+    // Recalculate overall accuracy
+    newStats.accuracy = newStats.settledBets > 0 ? newStats.wonBets / newStats.settledBets : 0;
+    
+    await updateDoc(userRef, newStats);
+    
+    console.log(`✅ Updated user stats for ${walletAddress}:`, newStats);
+    
+  } catch (error) {
+    console.error('Error updating user stats from slip:', error);
+    throw error;
+  }
+};
