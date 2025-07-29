@@ -264,7 +264,9 @@ import { toast } from "sonner";
 import { 
   updatePoolParticipation, 
   initializeUserStats,
-  storeBettingSlip 
+  storeBettingSlip ,
+  debugFirebaseConnection  // Add this import
+
 } from "@/lib/firebase/firestore";
 
 // export default function EnterPoolModal({ close }: { close: () => void }) {
@@ -610,6 +612,13 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
     }
 
     setLoading(true);
+
+    const firebaseConnected = await debugFirebaseConnection();
+    if (!firebaseConnected) {
+    toast.error("Firebase connection failed. Please try again.");
+    setLoading(false);
+    return;
+  }
 
     try {
       await debugContractState();

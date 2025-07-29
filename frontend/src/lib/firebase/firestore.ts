@@ -16,6 +16,33 @@ import { setDoc } from 'firebase/firestore';
 import { db } from './config';
 import { BetData, UserStats, LeaderboardEntry, PoolData } from '@/types/firebase';
 
+
+// Add this debug function at the top of your firestore.ts
+export const debugFirebaseConnection = async () => {
+  try {
+    console.log('🔍 Testing Firebase connection...');
+    console.log('Project ID:', process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID);
+    console.log('Environment:', process.env.NODE_ENV);
+    
+    // Test basic read operation
+    const testDoc = doc(db, 'test', 'debug');
+    const docSnap = await getDoc(testDoc);
+    
+    console.log('✅ Firebase read test successful');
+    
+    // Test basic write operation
+    await setDoc(testDoc, { 
+      lastTest: new Date().toISOString(),
+      environment: process.env.NODE_ENV
+    });
+    
+    console.log('✅ Firebase write test successful');
+    return true;
+  } catch (error) {
+    console.error('❌ Firebase connection failed:', error);
+    return false;
+  }
+};
 // Bets Collection
 export const addBet = async (betData: Omit<BetData, 'id'>) => {
   try {
