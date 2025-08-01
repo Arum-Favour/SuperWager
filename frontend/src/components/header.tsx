@@ -9,10 +9,10 @@ export default function Header() {
   return (
     <header className="flex justify-between items-center p-4">
       <h1>SuperWager</h1>
-      
+
       <div className="flex items-center gap-4">
         {authenticated && (
-          <span>Welcome, {user?.email || 'Wallet User'}</span>
+          <span>Welcome, {user?.email?.address || "Wallet User"}</span>
         )}
         <WalletConnectButton />
       </div>
