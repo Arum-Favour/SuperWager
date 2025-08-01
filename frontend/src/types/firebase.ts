@@ -54,7 +54,8 @@ export interface BetData extends GameState {
   timestamp: number;
   status: "pending" | "won" | "lost";
   settled: boolean;
-  potentialWin?: number;
+  selection: string;
+  potentialWin: number;
   settledAt?: number;
 }
 
