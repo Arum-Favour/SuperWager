@@ -3,7 +3,7 @@
 import { useLeaderboard } from "@/hooks/useLeaderboard";
 
 export default function LeaderboardTable() {
-  const { leaderboard, loading, error } = useLeaderboard(10);
+  const { leaderboard, loading, error } = useLeaderboard();
 
   if (loading)
     return <div className="text-center py-8">Loading leaderboard...</div>;

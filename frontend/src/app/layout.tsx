@@ -1,14 +1,9 @@
-import Navbar from "@/components/navbar";
-import { AuthModalProvider } from "@/context/AuthModalContext";
-import { BettingSlipsProvider } from "@/context/useBettingSlips";
-import { MatchesProvider } from "@/context/useMatchesContext";
-import { PrivyProvider } from "@/providers/PrivyProvider";
-import QueryProvider from "@/providers/QueryProvider";
-import type { Metadata } from "next";
-import { Toaster } from "sonner";
-import "./globals.css";
 import Aside from "@/components/aside";
 import MobileNav from "@/components/mobile-nav";
+import Navbar from "@/components/navbar";
+import Providers from "@/providers";
+import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "SuperWager",
@@ -23,25 +18,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <PrivyProvider>
-          <QueryProvider>
-            <AuthModalProvider>
-              <MatchesProvider>
-                <BettingSlipsProvider>
-                  <Toaster position="top-right" richColors />
-                  <main className="relative">
-                    <Navbar />
-                    <div className="w-full min-h-screen p-[5%] flex gap-16 max-w-screen-2xl mx-auto mb-16 lg:mb-0">
-                      <div className="flex-1 lg:flex-[80%]">{children}</div>
-                      <Aside />
-                    </div>
-                    <MobileNav />
-                  </main>
-                </BettingSlipsProvider>
-              </MatchesProvider>
-            </AuthModalProvider>
-          </QueryProvider>
-        </PrivyProvider>
+        <Providers>
+          <main className="relative">
+            <Navbar />
+            <div className="w-full min-h-screen p-[5%] flex gap-16 max-w-screen-2xl mx-auto mb-16 lg:mb-0">
+              <div className="flex-1 lg:flex-[80%]">{children}</div>
+              <Aside />
+            </div>
+            <MobileNav />
+          </main>
+        </Providers>
       </body>
     </html>
   );

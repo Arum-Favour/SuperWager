@@ -67,7 +67,7 @@ export default function MatchesTable() {
     removeSlip(slip as BettingSlip);
   };
 
-  const createSlip = () => {
+  const createSlip = async () => {
     if (!userData.user_id) {
       toast.error("Login to create bet slip");
       return;
@@ -77,7 +77,7 @@ export default function MatchesTable() {
       return;
     }
 
-    setPoolId(Date.now().toString());
+    setPoolId();
 
     toast.success("Slip successfully created");
 

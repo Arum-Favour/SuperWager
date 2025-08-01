@@ -23,10 +23,10 @@ const calcScore = (slips: BettingSlip[]) => {
 
   if (totalOdds <= 0) return 0;
 
-  const oddsWon = slips.reduce((acc, slip) => {
-    if (slip.outcome !== "won") return acc;
-    return acc + (parseFloat(slip.odds) || 0);
-  }, 0);
+  const oddsWon = slips.reduce(
+    (acc, slip) => acc + (slip.outcome === "won" ? parseFloat(slip.odds) : 0),
+    0
+  );
 
   return (oddsWon / totalOdds) * oddsWon;
 };
