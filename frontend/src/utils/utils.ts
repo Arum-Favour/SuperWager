@@ -19,3 +19,23 @@ export const daysArray = Array.from({ length: 5 }).map((_, i) => {
 });
 
 export const base_url = process.env.BASE_URL || "http://localhost:3000";
+
+export const calcScore = (slips: BettingSlip[]) => {
+  if (!slips.length) return 0;
+
+  const totalOdds = slips.reduce((acc, slip) => {
+    const odds = parseFloat(slip.odds) || 0;
+    return acc + odds;
+  }, 0);
+
+  if (totalOdds <= 0) return 0;
+
+  const oddsWon = slips.reduce(
+    (acc, slip) => acc + (slip.outcome === "won" ? parseFloat(slip.odds) : 0),
+    0
+  );
+
+  console.log("odds won", oddsWon);
+
+  return (oddsWon / totalOdds) * oddsWon;
+};

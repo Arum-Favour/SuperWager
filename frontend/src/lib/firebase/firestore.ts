@@ -12,6 +12,7 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "./config";
+import { calcScore } from "@/utils/utils";
 
 export const addBet = async (betData: Omit<BetData, "id">, bet_id: string) => {
   try {
@@ -66,15 +67,17 @@ export const updateBetStatus = async (
   walletAddress: string
 ) => {
   try {
+    const status = data.slips.every((slip) => slip.outcome === "won")
+      ? "won"
+      : "lost";
+
     const betRef = doc(db, "bets", betId);
-    await updateDoc(betRef, { ...data, settled: true });
+    await updateDoc(betRef, { ...data, status, settled: true });
 
     await updateUserStats(walletAddress, {
-      odds: data.slips.reduce((acc, slip) => acc + parseFloat(slip.odds), 0),
+      odds: calcScore(data.slips),
       settled: true,
-      status: data.slips.every((slip) => slip.outcome === "won")
-        ? "won"
-        : "lost",
+      status,
     });
   } catch (error) {
     console.error("Error updating bet status:", error);
@@ -187,11 +190,11 @@ export const updateUserStats = async (
       currentStats.settledBets! += 1;
       currentStats.totalOddsConcluded! += betData.odds;
 
-      if (betData.status === "won") {
-        currentStats.wonBets! += 1;
-        currentStats.totalOddsWon! += betData.odds;
-        currentStats.oddsProduct! *= betData.odds;
-      } else currentStats.lostBets! += 1;
+      if (betData.status === "won") currentStats.wonBets! += 1;
+      else currentStats.lostBets! += 1;
+
+      currentStats.totalOddsWon! += betData.odds;
+      currentStats.oddsProduct! *= betData.odds;
 
       currentStats.accuracy =
         currentStats.totalOddsConcluded! > 0

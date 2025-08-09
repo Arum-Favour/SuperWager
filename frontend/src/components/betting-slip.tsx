@@ -12,24 +12,7 @@ import Confetti from "react-confetti";
 import EnterPoolModal from "./enter-pool-modal";
 import Loader from "./loader";
 import SlipCard from "./slip-card";
-
-const calcScore = (slips: BettingSlip[]) => {
-  if (!slips.length) return 0;
-
-  const totalOdds = slips.reduce((acc, slip) => {
-    const odds = parseFloat(slip.odds) || 0;
-    return acc + odds;
-  }, 0);
-
-  if (totalOdds <= 0) return 0;
-
-  const oddsWon = slips.reduce(
-    (acc, slip) => acc + (slip.outcome === "won" ? parseFloat(slip.odds) : 0),
-    0
-  );
-
-  return (oddsWon / totalOdds) * oddsWon;
-};
+import { calcScore } from "@/utils/utils";
 
 export default function BettingSlip() {
   const router = useRouter();
@@ -131,7 +114,7 @@ export default function BettingSlip() {
     <>
       {hasPoolEnded && (
         <div className="fixed inset-0 items-center justify-center flex z-50 p-4">
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-black/50" onClick={resetSlip} />
           <div className="bg-white rounded-4xl p-8 relative flex flex-col items-center justify-center gap-6 md:gap-10 max-w-lg w-full">
             <h4 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl text-[var(--primary)] font-sembold">
               Congratulations
@@ -144,7 +127,7 @@ export default function BettingSlip() {
               <p>Total points obtained: {calcScore(slips).toFixed(2)}</p>
             </div>
             <div className="flex items-center gap-4 justify-center">
-              <Link href={"/leaderboard"}>
+              <Link href={"/leaderboard"} onClick={resetSlip}>
                 <button className="border border-[var(--primary)] rounded-lg px-3.5 py-4 md:text-lg text-[var(--primary)]">
                   Check leaderboard
                 </button>
