@@ -35,7 +35,5 @@ export const calcScore = (slips: BettingSlip[]) => {
     0
   );
 
-  console.log("odds won", oddsWon);
-
   return (oddsWon / totalOdds) * oddsWon;
 };
