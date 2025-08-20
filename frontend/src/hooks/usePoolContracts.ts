@@ -9,7 +9,6 @@ import { Chain, createWalletClient, custom, parseEther } from "viem";
 const viemSomniaChain: Chain = {
   id: 50312,
   name: "Somnia",
-  // name: "somnia",
   nativeCurrency: {
     name: "Somnia Token",
     symbol: "STT",
@@ -31,32 +30,33 @@ export function usePoolContract() {
   const { authenticated } = usePrivy();
   const { wallets } = useWallets();
   const [contract, setContract] = useState<ethers.Contract | null>(null);
-  const [embeddedWallet, setEmbeddedWallet] = useState<any>(null);
-  const [provider, setProvider] =
-    useState<ethers.providers.Web3Provider | null>(null);
+  const [activeWallet, setActiveWallet] = useState<any>(null);
+  const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const initContract = async () => {
+      setLoading(true);
+      setError(null);
+
       if (!authenticated || !wallets || wallets.length === 0) {
         setLoading(false);
+        setContract(null);
+        setProvider(null);
+        setActiveWallet(null);
         return;
       }
 
       try {
-        const embedded = wallets.find(
-          (wallet) => wallet.walletClientType === "privy"
-        );
+        // Prefer embedded wallet, but fallback to first external wallet
+        let wallet = wallets.find(w => w.walletClientType === "privy") || wallets[0];
+        setActiveWallet(wallet);
 
-        if (!embedded) {
-          setError("No embedded wallet found");
-          setLoading(false);
-          return;
-        }
+        // Always use getEthereumProvider
+        const ethProvider = await wallet.getEthereumProvider();
+        if (!ethProvider) throw new Error("No Ethereum provider found for wallet");
 
-        setEmbeddedWallet(embedded);
-        const ethProvider = await embedded.getEthereumProvider();
         const ethersProvider = new ethers.providers.Web3Provider(ethProvider);
         setProvider(ethersProvider);
 
@@ -76,6 +76,9 @@ export function usePoolContract() {
         setError(
           "Failed to initialize contract. Please check your wallet connection."
         );
+        setContract(null);
+        setProvider(null);
+        setActiveWallet(null);
       } finally {
         setLoading(false);
       }
@@ -99,12 +102,19 @@ export function usePoolContract() {
 
   // Enter the pool by sending STT using viem
   const enterPool = async (amount?: string) => {
-    if (!embeddedWallet) {
+    if (!activeWallet) {
       throw new Error("Wallet not initialized");
     }
 
     try {
-      const ethProvider = await embeddedWallet.getEthereumProvider();
+      let ethProvider;
+      if (activeWallet.getEthereumProvider) {
+        ethProvider = await activeWallet.getEthereumProvider();
+      } else if (activeWallet.getEthersProvider) {
+        ethProvider = await activeWallet.getEthersProvider();
+      }
+      if (!ethProvider) throw new Error("No Ethereum provider found for wallet");
+
       const client = createWalletClient({
         chain: viemSomniaChain,
         transport: custom(ethProvider),
@@ -118,7 +128,7 @@ export function usePoolContract() {
         abi: PoolContractABI.abi,
         functionName: "enterPool",
         value,
-        account: embeddedWallet.address as `0x${string}`,
+        account: activeWallet.address as `0x${string}`,
       });
 
       console.log("Transaction sent:", txHash);
@@ -138,10 +148,10 @@ export function usePoolContract() {
 
   // Check if user has entered the pool
   const hasUserEnteredPool = async (): Promise<boolean> => {
-    if (!contract || !embeddedWallet) return false;
+    if (!contract || !activeWallet) return false;
 
     try {
-      return await contract.hasEntered(embeddedWallet.address);
+      return await contract.hasEntered(activeWallet.address);
     } catch (err) {
       console.error("Error checking pool entry status:", err);
       return false;
@@ -174,7 +184,7 @@ export function usePoolContract() {
 
   // Check if current user is a winner
   const isUserWinner = async (): Promise<boolean> => {
-    if (!contract || !embeddedWallet) return false;
+    if (!contract || !activeWallet) return false;
 
     try {
       const winnersSelected = await contract.winnersSelected();
@@ -185,7 +195,7 @@ export function usePoolContract() {
       // Check if the user's address is in the winners array
       for (let i = 0; i < winnerCount; i++) {
         const winner = await contract.winners(i);
-        if (winner.toLowerCase() === embeddedWallet.address.toLowerCase()) {
+        if (winner.toLowerCase() === activeWallet.address.toLowerCase()) {
           return true;
         }
       }
@@ -212,10 +222,10 @@ export function usePoolContract() {
 
   // Get wallet balance
   const getWalletBalance = async (): Promise<string> => {
-    if (!provider || !embeddedWallet) throw new Error("Wallet not initialized");
+    if (!provider || !activeWallet) throw new Error("Wallet not initialized");
 
     try {
-      const balance = await provider.getBalance(embeddedWallet.address);
+      const balance = await provider.getBalance(activeWallet.address);
       return ethers.utils.formatEther(balance);
     } catch (err) {
       console.error("Error getting wallet balance:", err);
