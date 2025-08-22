@@ -140,12 +140,6 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
         (slip) => new Date(slip.matchDate) <= new Date()
       );
       if (hasStarted) {
-        if (!gameState.hasEnteredPool) {
-          setGameState(initialState);
-
-          clearInterval(interval);
-          return;
-        }
         setGameState((prev) => ({ ...prev, hasPoolStarted: true }));
         clearInterval(interval);
       }
