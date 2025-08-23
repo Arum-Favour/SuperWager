@@ -286,5 +286,6 @@ export function usePoolContract() {
     getPlayerCount,
     getWalletBalance,
     debugContractState,
+    isInitialized: !!contract && !loading && !error,  // Add this line
   };
 }

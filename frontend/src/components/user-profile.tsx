@@ -61,73 +61,136 @@ export default function UserProfile() {
             "address" in user.email
           )
             return user.email.address;
-
           return null;
         };
 
         const userEmailString = getUserEmail();
 
-        if (user.wallet?.address && !userEmailString) {
-          try {
-            let provider;
-            let balance = "0.000";
+        try {
+          // Check if user has external wallet (no email)
+          if (user.wallet && user.wallet.address && !userEmailString) {
+            console.log("🔗 Setting up external wallet:", user.wallet.address);
 
-            if (typeof window !== "undefined" && window.ethereum) {
+            // For external wallets, use the wallet from Privy's wallets array
+            const externalWallet = wallets.find(
+              (w) => w.address === user.wallet?.address
+            );
+
+            if (externalWallet) {
               try {
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                const balanceWei = await provider.getBalance(
-                  user.wallet.address
+                console.log("📡 Getting balance for external wallet...");
+                const provider = await externalWallet.getEthereumProvider();
+                const ethersProvider = new ethers.providers.Web3Provider(provider);
+
+                const balanceWei = await ethersProvider.getBalance(
+                  externalWallet.address
                 );
-                balance = ethers.utils.formatEther(balanceWei).substring(0, 6);
+                const balanceFormatted = ethers.utils.formatEther(balanceWei);
+
+                console.log("✅ External wallet balance:", balanceFormatted);
+
+                setUserData({
+                  username: `Wallet User`,
+                  user_id: user.id || user.wallet.address,
+                  email: "",
+                  embeddedWallet: null,
+                  walletAddress: user.wallet.address,
+                  balance: balanceFormatted.substring(0, 6),
+                });
               } catch (error) {
-                console.warn(
-                  "Could not fetch balance from external wallet:",
-                  error
-                );
+                console.error("❌ Error fetching external wallet balance:", error);
+
+                // Fallback: Set wallet data without balance
+                setUserData({
+                  username: `Wallet User`,
+                  user_id: user.id || user.wallet.address,
+                  email: "",
+                  embeddedWallet: null,
+                  walletAddress: user.wallet.address,
+                  balance: "0.000",
+                });
+              }
+            } else {
+              console.warn("⚠️ External wallet not found in wallets array");
+
+              // Fallback: Try using window.ethereum
+              if (typeof window !== "undefined" && window.ethereum) {
+                try {
+                  const provider = new ethers.providers.Web3Provider(window.ethereum);
+                  const balanceWei = await provider.getBalance(user.wallet.address);
+                  const balanceFormatted = ethers.utils.formatEther(balanceWei);
+
+                  setUserData({
+                    username: `Wallet User`,
+                    user_id: user.id || user.wallet.address,
+                    email: "",
+                    embeddedWallet: null,
+                    walletAddress: user.wallet.address,
+                    balance: balanceFormatted.substring(0, 6),
+                  });
+                } catch (error) {
+                  console.error("❌ Fallback balance fetch failed:", error);
+                  setUserData({
+                    username: `Wallet User`,
+                    user_id: user.id || user.wallet.address,
+                    email: "",
+                    embeddedWallet: null,
+                    walletAddress: user.wallet.address,
+                    balance: "0.000",
+                  });
+                }
               }
             }
-
-            setUserData({
-              username: `Wallet User`,
-              user_id: user.id || user.wallet.address,
-              email: userEmailString || "",
-              embeddedWallet: null,
-              walletAddress: user.wallet.address,
-              balance: balance,
-            });
-          } catch (error) {
-            console.error("Error setting up external wallet:", error);
           }
-        } else if (wallets) {
-          const embedded = wallets.find(
-            (wallet) => wallet.walletClientType === "privy"
-          );
+          // Handle embedded wallet (email login)
+          else if (wallets && wallets.length > 0) {
+            console.log("📧 Setting up embedded wallet...");
 
-          if (embedded) {
-            try {
-              const provider = await embedded.getEthereumProvider();
-              const ethersProvider = new ethers.providers.Web3Provider(
-                provider
-              );
-              const balance = await ethersProvider.getBalance(embedded.address);
+            const embedded = wallets.find(
+              (wallet) => wallet.walletClientType === "privy"
+            );
 
-              setUserData({
-                username:
-                  (userEmailString
-                    ? userEmailString.split("@")[0]
-                    : username) ||
-                  username ||
-                  "User",
-                user_id: user.id || user_id,
-                email: userEmailString || email || "",
-                embeddedWallet: embedded,
-                walletAddress: embedded.address,
-                balance: ethers.utils.formatEther(balance).substring(0, 6),
-              });
-            } catch (error) {
-              console.error("Error fetching embedded wallet balance:", error);
+            if (embedded) {
+              try {
+                console.log("📡 Getting balance for embedded wallet...");
+                const provider = await embedded.getEthereumProvider();
+                const ethersProvider = new ethers.providers.Web3Provider(provider);
+                const balanceWei = await ethersProvider.getBalance(embedded.address);
+                const balanceFormatted = ethers.utils.formatEther(balanceWei);
+
+                console.log("✅ Embedded wallet balance:", balanceFormatted);
+
+                setUserData({
+                  username:
+                    (userEmailString
+                      ? userEmailString.split("@")[0]
+                      : username) || username || "User",
+                  user_id: user.id || user_id,
+                  email: userEmailString || email || "",
+                  embeddedWallet: embedded,
+                  walletAddress: embedded.address,
+                  balance: balanceFormatted.substring(0, 6),
+                });
+              } catch (error) {
+                console.error("❌ Error fetching embedded wallet balance:", error);
+
+                // Set user data without balance as fallback
+                setUserData({
+                  username:
+                    (userEmailString
+                      ? userEmailString.split("@")[0]
+                      : username) || username || "User",
+                  user_id: user.id || user_id,
+                  email: userEmailString || email || "",
+                  embeddedWallet: embedded,
+                  walletAddress: embedded.address,
+                  balance: "0.000",
+                });
+              }
             }
           }
+        } catch (error) {
+          console.error("❌ Error in setupWallet:", error);
         }
       }
     };
