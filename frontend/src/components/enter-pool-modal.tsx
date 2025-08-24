@@ -20,6 +20,7 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
     getPlayerCount,
     debugContractState,
     loading: contractLoading,
+    isInitialized,
   } = usePoolContract();
 
   const {
@@ -229,23 +230,25 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
             disabled={
               loading ||
               contractLoading ||
+              !isInitialized || // Add this line
               balance < poolOption ||
               hasEnteredPool ||
               alreadyEntered ||
-              hasPoolStarted ||
-              loading
+              hasPoolStarted
             }
             onClick={handleEnterPool}
-            className="flex items-center justify-center text-sm md:text-lg font-normal bg-[var(--primary)] rounded-lg px-2 md:px-3.5 py-2.5 md:py-4 text-white capitalize hover:bg-[var(--primary)]/80"
+            className="flex items-center justify-center text-sm md:text-lg font-normal bg-[var(--primary)] rounded-lg px-2 md:px-3.5 py-2.5 md:py-4 text-white capitalize hover:bg-[var(--primary)]/80 disabled:opacity-50"
           >
             {loading || contractLoading ? (
               <Loader2 className="size-6 animate-spin" />
+            ) : !isInitialized ? (
+              "Connecting Wallet..." // Add this condition
             ) : hasEnteredPool || alreadyEntered ? (
               "Already Entered"
             ) : hasPoolStarted ? (
               "Pool Started"
             ) : (
-              "Enter Pool"
+              "Enter Pool & Save Slip"
             )}
           </button>
         </div>
