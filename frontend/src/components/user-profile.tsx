@@ -24,7 +24,6 @@ export default function UserProfile() {
   const { wallets } = useWallets();
 
   const {
-    openLoginModal,
     userData: {
       balance,
       walletAddress,
@@ -80,7 +79,9 @@ export default function UserProfile() {
               try {
                 console.log("📡 Getting balance for external wallet...");
                 const provider = await externalWallet.getEthereumProvider();
-                const ethersProvider = new ethers.providers.Web3Provider(provider);
+                const ethersProvider = new ethers.providers.Web3Provider(
+                  provider
+                );
 
                 const balanceWei = await ethersProvider.getBalance(
                   externalWallet.address
@@ -98,7 +99,10 @@ export default function UserProfile() {
                   balance: balanceFormatted.substring(0, 6),
                 });
               } catch (error) {
-                console.error("❌ Error fetching external wallet balance:", error);
+                console.error(
+                  "❌ Error fetching external wallet balance:",
+                  error
+                );
 
                 // Fallback: Set wallet data without balance
                 setUserData({
@@ -116,8 +120,12 @@ export default function UserProfile() {
               // Fallback: Try using window.ethereum
               if (typeof window !== "undefined" && window.ethereum) {
                 try {
-                  const provider = new ethers.providers.Web3Provider(window.ethereum);
-                  const balanceWei = await provider.getBalance(user.wallet.address);
+                  const provider = new ethers.providers.Web3Provider(
+                    window.ethereum
+                  );
+                  const balanceWei = await provider.getBalance(
+                    user.wallet.address
+                  );
                   const balanceFormatted = ethers.utils.formatEther(balanceWei);
 
                   setUserData({
@@ -154,8 +162,12 @@ export default function UserProfile() {
               try {
                 console.log("📡 Getting balance for embedded wallet...");
                 const provider = await embedded.getEthereumProvider();
-                const ethersProvider = new ethers.providers.Web3Provider(provider);
-                const balanceWei = await ethersProvider.getBalance(embedded.address);
+                const ethersProvider = new ethers.providers.Web3Provider(
+                  provider
+                );
+                const balanceWei = await ethersProvider.getBalance(
+                  embedded.address
+                );
                 const balanceFormatted = ethers.utils.formatEther(balanceWei);
 
                 console.log("✅ Embedded wallet balance:", balanceFormatted);
@@ -164,7 +176,9 @@ export default function UserProfile() {
                   username:
                     (userEmailString
                       ? userEmailString.split("@")[0]
-                      : username) || username || "User",
+                      : username) ||
+                    username ||
+                    "User",
                   user_id: user.id || user_id,
                   email: userEmailString || email || "",
                   embeddedWallet: embedded,
@@ -172,14 +186,19 @@ export default function UserProfile() {
                   balance: balanceFormatted.substring(0, 6),
                 });
               } catch (error) {
-                console.error("❌ Error fetching embedded wallet balance:", error);
+                console.error(
+                  "❌ Error fetching embedded wallet balance:",
+                  error
+                );
 
                 // Set user data without balance as fallback
                 setUserData({
                   username:
                     (userEmailString
                       ? userEmailString.split("@")[0]
-                      : username) || username || "User",
+                      : username) ||
+                    username ||
+                    "User",
                   user_id: user.id || user_id,
                   email: userEmailString || email || "",
                   embeddedWallet: embedded,
