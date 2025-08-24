@@ -220,12 +220,12 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
           </p>
         )}
         <div className="flex items-center justify-center gap-4">
-          <p className="text-[var(--primary)] text-sm sm:text-xl md:text-2xl font-medium flex gap-2 items-center cursor-pointer">
+          {/* <p className="text-[var(--primary)] text-sm sm:text-xl md:text-2xl font-medium flex gap-2 items-center cursor-pointer">
             Fund Wallet
             <span>
               <Plus className="size-4 md:size-6 stroke-[var(--primary)] stroke-2" />
             </span>
-          </p>
+          </p> */}
           <button
             disabled={
               loading ||
