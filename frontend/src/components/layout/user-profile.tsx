@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuthModal } from "@/context/AuthModalContext";
+import useSSTInteraction from "@/hooks/useSSTInteraction";
 import { Menu, MenuButton, MenuItems, Transition } from "@headlessui/react";
 import {
   ArrowDownTrayIcon,
@@ -16,10 +17,10 @@ import {
   WalletIcon,
 } from "lucide-react";
 import React, { Fragment, useEffect, useState } from "react";
-import LoginModal from "./auth-modal";
+import LoginModal from "../modals/auth-modal";
 
 export default function UserProfile() {
-  const { authenticated, ready, user, login, logout } = usePrivy();
+  const { authenticated, ready, user, login } = usePrivy();
   const { sendTransaction } = useSendTransaction();
   const { wallets } = useWallets();
 
@@ -37,33 +38,133 @@ export default function UserProfile() {
     handleLogout,
   } = useAuthModal();
 
+  const {
+    isFundModalOpen,
+    setIsFundModalOpen,
+    isWithdrawModalOpen,
+    setIsWithdrawModalOpen,
+  } = useSSTInteraction();
+
   const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [isSigning, setIsSigning] = useState(false);
-  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [recipientAddress, setRecipientAddress] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("0.001");
   const [txHash, setTxHash] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isFundModalOpen, setIsFundModalOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+
+  const handleFund = async () => {
+    setIsWalletMenuOpen(false);
+
+    if (!walletAddress && !embeddedWallet)
+      if (user?.wallet?.address) setIsFundModalOpen(true);
+      else handleLogin();
+    else setIsFundModalOpen(true);
+  };
+
+  const copyToClipboard = async () => {
+    const addressToCopy = walletAddress || user?.wallet?.address;
+    if (addressToCopy)
+      try {
+        await navigator.clipboard.writeText(addressToCopy);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 3000);
+      } catch (err) {
+        console.error("Failed to copy: ", err);
+      }
+  };
+
+  const openWithdrawModal = () => {
+    setIsWithdrawModalOpen(true);
+    setIsWalletMenuOpen(false);
+    setErrorMessage(null);
+    setTxHash(null);
+  };
+
+  const handleWithdraw = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const activeWallet = embeddedWallet || user?.wallet;
+    if (!activeWallet) return;
+
+    if (!recipientAddress || !withdrawAmount) {
+      setErrorMessage("Please enter both recipient address and amount");
+      return;
+    }
+
+    setIsSending(true);
+    setErrorMessage(null);
+    setTxHash(null);
+
+    try {
+      if (!ethers.utils.isAddress(recipientAddress))
+        throw new Error("Invalid Ethereum address");
+
+      const amountInEth = parseFloat(withdrawAmount);
+      if (isNaN(amountInEth) || amountInEth <= 0)
+        throw new Error("Please enter a valid amount");
+
+      const weiValue = ethers.utils.parseEther(withdrawAmount);
+      const hexWeiValue = ethers.utils.hexlify(weiValue);
+
+      const tx = {
+        to: recipientAddress,
+        chainId: 0xc488, // Use the Somnia chain ID
+        value: hexWeiValue,
+      };
+
+      const txConfig = {
+        uiOptions: {
+          header: "Send Transaction",
+          description: `Send ${withdrawAmount} STT to ${recipientAddress.substring(
+            0,
+            6
+          )}...`,
+          buttonText: "Confirm",
+        },
+      };
+
+      const txResponse = await sendTransaction(tx, txConfig);
+      console.log("Transaction sent:", txResponse);
+      setTxHash(txResponse.hash);
+    } catch (error: any) {
+      console.error("Error sending transaction:", error);
+      setErrorMessage(error.message || "Failed to send transaction");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleDisconnect = () => {
+    handleLogout();
+  };
+
+  const getDisplayEmail = () => {
+    if (email) return email;
+    if (!user?.email) return null;
+    if (typeof user.email === "string") return user.email;
+    if (typeof user.email === "object" && "address" in user.email)
+      return user.email.address;
+
+    return null;
+  };
+
+  const getUsernameFromEmail = (emailStr: string | null) => {
+    if (!emailStr) return null;
+    return emailStr.split("@")[0];
+  };
+
+  const displayEmail = getDisplayEmail();
+  const displayUsername =
+    username || getUsernameFromEmail(displayEmail) || "Wallet User";
+  const displayWalletAddress = walletAddress || user?.wallet?.address;
+  const displayBalance = balance || "0.000";
 
   useEffect(() => {
     const setupWallet = async () => {
       if (ready && authenticated && user) {
-        const getUserEmail = () => {
-          if (!user.email) return null;
-          if (typeof user.email === "string") return user.email;
-          if (
-            user.email &&
-            typeof user.email === "object" &&
-            "address" in user.email
-          )
-            return user.email.address;
-          return null;
-        };
-
-        const userEmailString = getUserEmail();
+        const userEmailString = getDisplayEmail();
 
         try {
           // Check if user has external wallet (no email)
@@ -226,92 +327,6 @@ export default function UserProfile() {
     email,
   ]);
 
-  const handleFund = async () => {
-    setIsWalletMenuOpen(false);
-
-    if (!walletAddress && !embeddedWallet)
-      if (user?.wallet?.address) setIsFundModalOpen(true);
-      else handleLogin();
-    else setIsFundModalOpen(true);
-  };
-
-  const copyToClipboard = async () => {
-    const addressToCopy = walletAddress || user?.wallet?.address;
-    if (addressToCopy)
-      try {
-        await navigator.clipboard.writeText(addressToCopy);
-        setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 3000);
-      } catch (err) {
-        console.error("Failed to copy: ", err);
-      }
-  };
-
-  const openWithdrawModal = () => {
-    setIsWithdrawModalOpen(true);
-    setIsWalletMenuOpen(false);
-    setErrorMessage(null);
-    setTxHash(null);
-  };
-
-  const handleWithdraw = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const activeWallet = embeddedWallet || user?.wallet;
-    if (!activeWallet) return;
-
-    if (!recipientAddress || !withdrawAmount) {
-      setErrorMessage("Please enter both recipient address and amount");
-      return;
-    }
-
-    setIsSending(true);
-    setErrorMessage(null);
-    setTxHash(null);
-
-    try {
-      if (!ethers.utils.isAddress(recipientAddress))
-        throw new Error("Invalid Ethereum address");
-
-      const amountInEth = parseFloat(withdrawAmount);
-      if (isNaN(amountInEth) || amountInEth <= 0)
-        throw new Error("Please enter a valid amount");
-
-      const weiValue = ethers.utils.parseEther(withdrawAmount);
-      const hexWeiValue = ethers.utils.hexlify(weiValue);
-
-      const tx = {
-        to: recipientAddress,
-        chainId: 0xc488, // Use the Somnia chain ID
-        value: hexWeiValue,
-      };
-
-      const txConfig = {
-        uiOptions: {
-          header: "Send Transaction",
-          description: `Send ${withdrawAmount} STT to ${recipientAddress.substring(
-            0,
-            6
-          )}...`,
-          buttonText: "Confirm",
-        },
-      };
-
-      const txResponse = await sendTransaction(tx, txConfig);
-      console.log("Transaction sent:", txResponse);
-      setTxHash(txResponse.hash);
-    } catch (error: any) {
-      console.error("Error sending transaction:", error);
-      setErrorMessage(error.message || "Failed to send transaction");
-    } finally {
-      setIsSending(false);
-    }
-  };
-
-  const handleDisconnect = () => {
-    handleLogout();
-  };
-
   if (!ready) return null;
 
   if (!authenticated) {
@@ -330,27 +345,6 @@ export default function UserProfile() {
       </>
     );
   }
-
-  const getDisplayEmail = () => {
-    if (email) return email;
-    if (!user?.email) return null;
-    if (typeof user.email === "string") return user.email;
-    if (typeof user.email === "object" && "address" in user.email) {
-      return user.email.address;
-    }
-    return null;
-  };
-
-  const getUsernameFromEmail = (emailStr: string | null) => {
-    if (!emailStr) return null;
-    return emailStr.split("@")[0];
-  };
-
-  const displayEmail = getDisplayEmail();
-  const displayUsername =
-    username || getUsernameFromEmail(displayEmail) || "Wallet User";
-  const displayWalletAddress = walletAddress || user?.wallet?.address;
-  const displayBalance = balance || "0.000";
 
   return (
     <>
@@ -473,7 +467,9 @@ export default function UserProfile() {
             <div
               className="fixed inset-0 transition-opacity"
               aria-hidden="true"
-              onClick={() => setIsWithdrawModalOpen(false)}
+              onClick={() => {
+                setIsWithdrawModalOpen(false);
+              }}
             >
               <div className="absolute inset-0 bg-black opacity-75" />
             </div>
@@ -487,7 +483,9 @@ export default function UserProfile() {
                         Send STT
                       </h3>
                       <button
-                        onClick={() => setIsWithdrawModalOpen(false)}
+                        onClick={() => {
+                          setIsWithdrawModalOpen(false);
+                        }}
                         className="text-white"
                       >
                         <XMarkIcon className="size-6" />
@@ -512,7 +510,9 @@ export default function UserProfile() {
                             </a>
                           </div>
                           <button
-                            onClick={() => setIsWithdrawModalOpen(false)}
+                            onClick={() => {
+                              setIsWithdrawModalOpen(false);
+                            }}
                             className="mt-4 inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-[var(--primary)] text-base font-medium text-white"
                           >
                             Close
@@ -564,7 +564,9 @@ export default function UserProfile() {
                           <div className="mt-6 flex gap-4 items-center justify-end">
                             <button
                               type="button"
-                              onClick={() => setIsWithdrawModalOpen(false)}
+                              onClick={() => {
+                                setIsWithdrawModalOpen(false);
+                              }}
                               className="rounded-md border border-gray-300 px-6 py-2 bg-white text-base font-medium text-black"
                             >
                               Cancel
@@ -594,7 +596,9 @@ export default function UserProfile() {
             <div
               className="fixed inset-0 transition-opacity"
               aria-hidden="true"
-              onClick={() => setIsFundModalOpen(false)}
+              onClick={() => {
+                setIsFundModalOpen(false);
+              }}
             >
               <div className="absolute inset-0 bg-black opacity-75" />
             </div>
@@ -608,7 +612,9 @@ export default function UserProfile() {
                         Get Test STT
                       </h3>
                       <button
-                        onClick={() => setIsFundModalOpen(false)}
+                        onClick={() => {
+                          setIsFundModalOpen(false);
+                        }}
                         className="text-white"
                       >
                         <XMarkIcon className="size-6" />
@@ -660,7 +666,9 @@ export default function UserProfile() {
 
                       <div className="mt-4">
                         <button
-                          onClick={() => setIsFundModalOpen(false)}
+                          onClick={() => {
+                            setIsFundModalOpen(false);
+                          }}
                           className="w-full flex items-center justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-white text-[var(--primary)] text-base font-medium"
                         >
                           Close

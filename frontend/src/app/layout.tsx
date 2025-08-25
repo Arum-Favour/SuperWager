@@ -1,6 +1,6 @@
-import Aside from "@/components/aside";
-import MobileNav from "@/components/mobile-nav";
-import Navbar from "@/components/navbar";
+import Aside from "@/components/layout/aside";
+import MobileNav from "@/components/layout/mobile-nav";
+import Navbar from "@/components/layout/navbar";
 import Providers from "@/providers";
 import type { Metadata } from "next";
 import "./globals.css";

@@ -4,8 +4,7 @@ import { useBettingSlips } from "@/context/useBettingSlips";
 import { usePoolContract } from "@/hooks/usePoolContracts";
 import { addBet, updatePoolParticipation } from "@/lib/firebase/firestore";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { randomUUID } from "crypto";
-import { Loader2, Plus, TriangleAlert } from "lucide-react";
+import { Loader2, TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
@@ -23,6 +22,8 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
     isInitialized,
   } = usePoolContract();
 
+  // const { setIsFundModalOpen } = useSSTInteraction();
+
   const {
     slips,
     poolId,
@@ -38,11 +39,11 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
 
   const [poolOption, setPoolOption] = useState("0.1");
 
-  const increase = () =>
-    setPoolOption((prev) => (parseFloat(prev) + 0.1).toFixed(2));
+  // const increase = () =>
+  //   setPoolOption((prev) => (parseFloat(prev) + 0.1).toFixed(2));
 
-  const decrease = () =>
-    setPoolOption((prev) => Math.max(0.2, parseFloat(prev) - 0.1).toFixed(2));
+  // const decrease = () =>
+  //   setPoolOption((prev) => Math.max(0.1, parseFloat(prev) - 0.1).toFixed(2));
 
   const [loading, setLoading] = useState(false);
   const [poolBalance, setPoolBalance] = useState<string>("0");
@@ -220,7 +221,13 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
           </p>
         )}
         <div className="flex items-center justify-center gap-4">
-          {/* <p className="text-[var(--primary)] text-sm sm:text-xl md:text-2xl font-medium flex gap-2 items-center cursor-pointer">
+          {/* <p
+            onClick={() => {
+              setIsFundModalOpen(true);
+              close();
+            }}
+            className="text-[var(--primary)] text-sm sm:text-xl md:text-2xl font-medium flex gap-2 items-center cursor-pointer"
+          >
             Fund Wallet
             <span>
               <Plus className="size-4 md:size-6 stroke-[var(--primary)] stroke-2" />
@@ -230,7 +237,7 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
             disabled={
               loading ||
               contractLoading ||
-              !isInitialized || // Add this line
+              !isInitialized ||
               balance < poolOption ||
               hasEnteredPool ||
               alreadyEntered ||
@@ -242,7 +249,7 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
             {loading || contractLoading ? (
               <Loader2 className="size-6 animate-spin" />
             ) : !isInitialized ? (
-              "Connecting Wallet..." // Add this condition
+              "Connecting Wallet..."
             ) : hasEnteredPool || alreadyEntered ? (
               "Already Entered"
             ) : hasPoolStarted ? (

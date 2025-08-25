@@ -1,4 +1,4 @@
-import BettingSlip from "@/components/betting-slip";
+import BettingSlip from "./betting-slip";
 
 export default function page() {
   return <BettingSlip />;

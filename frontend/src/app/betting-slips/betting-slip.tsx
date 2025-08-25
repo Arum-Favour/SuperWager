@@ -4,15 +4,15 @@ import TrophyIcon from "@/assets/svgs/trophy";
 import { useAuthModal } from "@/context/AuthModalContext";
 import { useBettingSlips } from "@/context/useBettingSlips";
 import { fetchMatches } from "@/utils/queries";
+import { calcScore } from "@/utils/utils";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Confetti from "react-confetti";
-import EnterPoolModal from "./enter-pool-modal";
-import Loader from "./loader";
+import EnterPoolModal from "../../components/modals/enter-pool-modal";
+import Loader from "../../components/ui/loader";
 import SlipCard from "./slip-card";
-import { calcScore } from "@/utils/utils";
 
 export default function BettingSlip() {
   const router = useRouter();

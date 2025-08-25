@@ -352,6 +352,10 @@ export default function MatchesTable() {
                           toast.error("Match ended, cannot add match to slip");
                           return;
                         }
+                        if (!odds.length) {
+                          toast.error("Odds not available for this match");
+                          return;
+                        }
                         slips.find(
                           (item) =>
                             item.homeTeam ===
@@ -421,6 +425,10 @@ export default function MatchesTable() {
                       onClick={() => {
                         if (match.sport_event_status.match_status === "ended") {
                           toast.error("Match ended, cannot add match to slip");
+                          return;
+                        }
+                        if (!odds.length) {
+                          toast.error("Odds not available for this match");
                           return;
                         }
                         slips.find(
@@ -493,6 +501,10 @@ export default function MatchesTable() {
                       onClick={() => {
                         if (match.sport_event_status.match_status === "ended") {
                           toast.error("Match ended, cannot add match to slip");
+                          return;
+                        }
+                        if (!odds.length) {
+                          toast.error("Odds not available for this match");
                           return;
                         }
                         slips.find(
