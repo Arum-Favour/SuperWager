@@ -22,8 +22,6 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
     isInitialized,
   } = usePoolContract();
 
-  // const { setIsFundModalOpen } = useSSTInteraction();
-
   const {
     slips,
     poolId,
@@ -44,6 +42,8 @@ export default function EnterPoolModal({ close }: { close: () => void }) {
 
   // const decrease = () =>
   //   setPoolOption((prev) => Math.max(0.1, parseFloat(prev) - 0.1).toFixed(2));
+
+  // const { setIsFundModalOpen } = useSSTInteraction();
 
   const [loading, setLoading] = useState(false);
   const [poolBalance, setPoolBalance] = useState<string>("0");

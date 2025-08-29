@@ -31,7 +31,8 @@ export function usePoolContract() {
   const { wallets } = useWallets();
   const [contract, setContract] = useState<ethers.Contract | null>(null);
   const [activeWallet, setActiveWallet] = useState<any>(null);
-  const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
+  const [provider, setProvider] =
+    useState<ethers.providers.Web3Provider | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,12 +51,14 @@ export function usePoolContract() {
 
       try {
         // Prefer embedded wallet, but fallback to first external wallet
-        let wallet = wallets.find(w => w.walletClientType === "privy") || wallets[0];
+        let wallet =
+          wallets.find((w) => w.walletClientType === "privy") || wallets[0];
         setActiveWallet(wallet);
 
         // Always use getEthereumProvider
         const ethProvider = await wallet.getEthereumProvider();
-        if (!ethProvider) throw new Error("No Ethereum provider found for wallet");
+        if (!ethProvider)
+          throw new Error("No Ethereum provider found for wallet");
 
         const ethersProvider = new ethers.providers.Web3Provider(ethProvider);
         setProvider(ethersProvider);
@@ -113,18 +116,18 @@ export function usePoolContract() {
       } else if (activeWallet.getEthersProvider) {
         ethProvider = await activeWallet.getEthersProvider();
       }
-      if (!ethProvider) throw new Error("No Ethereum provider found for wallet");
+      if (!ethProvider)
+        throw new Error("No Ethereum provider found for wallet");
 
       const client = createWalletClient({
         chain: viemSomniaChain,
         transport: custom(ethProvider),
       });
 
-      const contractAddress = getContractAddress(viemSomniaChain.id);
       const value = parseEther(amount || "0.1");
 
       const txHash = await client.writeContract({
-        address: contractAddress as `0x${string}`,
+        address: contract?.address as `0x${string}`,
         abi: PoolContractABI.abi,
         functionName: "enterPool",
         value,
@@ -286,6 +289,6 @@ export function usePoolContract() {
     getPlayerCount,
     getWalletBalance,
     debugContractState,
-    isInitialized: !!contract && !loading && !error,  // Add this line
+    isInitialized: !!contract && !loading && !error, // Add this line
   };
 }
