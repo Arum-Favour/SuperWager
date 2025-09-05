@@ -110,7 +110,7 @@ export default function UserProfile() {
 
       const tx = {
         to: recipientAddress,
-        chainId: 0xc488, // Use the Somnia chain ID
+        chainId: 0xc488,
         value: hexWeiValue,
       };
 

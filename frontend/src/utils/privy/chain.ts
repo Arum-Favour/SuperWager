@@ -1,31 +1,29 @@
-import { defineChain } from 'viem';
+import { defineChain } from "viem";
 
 export const somniaChain = defineChain({
-  id: 0xc488, // Replace with the actual Somnia chain ID (use number, not string)
-  name: 'Somnia',
-  network: 'somnia',
+  id: 50312,
+  name: "Somnia",
+  network: "somnia",
   nativeCurrency: {
     decimals: 18,
-    name: 'Somnia Test Token',
-    symbol: 'STT'
+    name: "Somnia Test Token",
+    symbol: "STT",
   },
   rpcUrls: {
     default: {
-      http: ['https://dream-rpc.somnia.network'], // Replace with actual RPC URL
-    //   webSocket: ['wss://ws.somnia.network'] // Replace if WebSocket is available
+      http: ["https://dream-rpc.somnia.network"],
+      //   webSocket: ['wss://ws.somnia.network']
     },
     public: {
-      http: ['https://dream-rpc.somnia.network'], // Replace with actual RPC URL
-    //   webSocket: ['wss://ws.somnia.network'] // Replace if WebSocket is available
-    }
+      http: ["https://dream-rpc.somnia.network"],
+      //   webSocket: ['wss://ws.somnia.network']
+    },
   },
   blockExplorers: {
     default: {
-      name: 'Somnia Explorer',
-      url: 'https://shannon-explorer.somnia.network/' // Replace with actual explorer URL
-    }
+      name: "Somnia Explorer",
+      url: "https://shannon-explorer.somnia.network/",
+    },
   },
-  contracts: {
-    // Add any network-specific contract addresses if needed
-  }
+  contracts: {},
 });

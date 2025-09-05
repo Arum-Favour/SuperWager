@@ -1,30 +1,30 @@
 import PoolContractABI from "@/assets/data/PoolContract.json";
 import { getContractAddress } from "@/utils/privy/addresses";
+import { somniaChain } from "@/utils/privy/chain";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
-import { Chain, createWalletClient, custom, parseEther } from "viem";
+import { createWalletClient, custom, parseEther } from "viem";
 
-// viem-compatible Somnia chain config
-const viemSomniaChain: Chain = {
-  id: 50312,
-  name: "Somnia",
-  nativeCurrency: {
-    name: "Somnia Token",
-    symbol: "STT",
-    decimals: 18,
-  },
-  rpcUrls: {
-    default: { http: ["https://dream-rpc.somnia.network"] },
-    public: { http: ["https://dream-rpc.somnia.network"] },
-  },
-  blockExplorers: {
-    default: {
-      name: "Somnia Explorer",
-      url: "", // Add explorer URL if available
-    },
-  },
-};
+// const viemSomniaChain: Chain = {
+//   id: 50312,
+//   name: "Somnia",
+//   nativeCurrency: {
+//     name: "Somnia Token",
+//     symbol: "STT",
+//     decimals: 18,
+//   },
+//   rpcUrls: {
+//     default: { http: ["https://dream-rpc.somnia.network"] },
+//     public: { http: ["https://dream-rpc.somnia.network"] },
+//   },
+//   blockExplorers: {
+//     default: {
+//       name: "Somnia Explorer",
+//       url: "",
+//     },
+//   },
+// };
 
 export function usePoolContract() {
   const { authenticated } = usePrivy();
@@ -50,12 +50,10 @@ export function usePoolContract() {
       }
 
       try {
-        // Prefer embedded wallet, but fallback to first external wallet
         let wallet =
           wallets.find((w) => w.walletClientType === "privy") || wallets[0];
         setActiveWallet(wallet);
 
-        // Always use getEthereumProvider
         const ethProvider = await wallet.getEthereumProvider();
         if (!ethProvider)
           throw new Error("No Ethereum provider found for wallet");
@@ -63,13 +61,14 @@ export function usePoolContract() {
         const ethersProvider = new ethers.providers.Web3Provider(ethProvider);
         setProvider(ethersProvider);
 
-        const contractAddress = getContractAddress(viemSomniaChain.id);
+        const contractAddress = getContractAddress(somniaChain.id);
 
-        // Create contract instance - readonly
+        const signer = ethersProvider.getSigner();
+
         const poolContract = new ethers.Contract(
           contractAddress as string,
           PoolContractABI.abi,
-          ethersProvider
+          signer
         );
 
         setContract(poolContract);
@@ -103,50 +102,54 @@ export function usePoolContract() {
     }
   };
 
-  // Enter the pool by sending STT using viem
+  // const enterPool = async (amount?: string) => {
+  //   if (!activeWallet) throw new Error("Wallet not initialized");
+
+  //   try {
+  //     let ethProvider;
+  //     if (activeWallet.getEthereumProvider)
+  //       ethProvider = await activeWallet.getEthereumProvider();
+  //     else if (activeWallet.getEthersProvider)
+  //       ethProvider = await activeWallet.getEthersProvider();
+
+  //     if (!ethProvider)
+  //       throw new Error("No Ethereum provider found for wallet");
+
+  //     const client = createWalletClient({
+  //       chain: somniaChain,
+  //       transport: custom(ethProvider),
+  //     });
+
+  //     const value = parseEther(amount || "0.1");
+
+  //     const txHash = await client.writeContract({
+  //       address: contract?.address as `0x${string}`,
+  //       abi: PoolContractABI.abi,
+  //       functionName: "enterPool",
+  //       value,
+  //       account: activeWallet.address as `0x${string}`,
+  //     });
+
+  //     console.log("Transaction sent:", txHash);
+
+  //     // Optionally, wait for confirmation using ethers if you want:
+  //     if (provider) {
+  //       const receipt = await provider.waitForTransaction(txHash);
+  //       console.log("Transaction confirmed:", receipt);
+  //       return { hash: txHash, receipt };
+  //     }
+  //     return { hash: txHash };
+  //   } catch (err) {
+  //     console.error("Error entering pool:", err);
+  //     throw err;
+  //   }
+  // };
+
   const enterPool = async (amount?: string) => {
-    if (!activeWallet) {
-      throw new Error("Wallet not initialized");
-    }
-
-    try {
-      let ethProvider;
-      if (activeWallet.getEthereumProvider) {
-        ethProvider = await activeWallet.getEthereumProvider();
-      } else if (activeWallet.getEthersProvider) {
-        ethProvider = await activeWallet.getEthersProvider();
-      }
-      if (!ethProvider)
-        throw new Error("No Ethereum provider found for wallet");
-
-      const client = createWalletClient({
-        chain: viemSomniaChain,
-        transport: custom(ethProvider),
-      });
-
-      const value = parseEther(amount || "0.1");
-
-      const txHash = await client.writeContract({
-        address: contract?.address as `0x${string}`,
-        abi: PoolContractABI.abi,
-        functionName: "enterPool",
-        value,
-        account: activeWallet.address as `0x${string}`,
-      });
-
-      console.log("Transaction sent:", txHash);
-
-      // Optionally, wait for confirmation using ethers if you want:
-      if (provider) {
-        const receipt = await provider.waitForTransaction(txHash);
-        console.log("Transaction confirmed:", receipt);
-        return { hash: txHash, receipt };
-      }
-      return { hash: txHash };
-    } catch (err) {
-      console.error("Error entering pool:", err);
-      throw err;
-    }
+    if (!contract) throw new Error("Contract not initialized");
+    const value = ethers.utils.parseEther(amount || "0.1");
+    const tx = await contract.enterPool({ value });
+    return await tx.wait();
   };
 
   // Check if user has entered the pool
